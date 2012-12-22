@@ -1,0 +1,26 @@
+{
+	"name": "weaver",
+	"version": "0.0.1",
+	"description": "Interactive process management system",
+	"main": "./lib/weaver.js",
+	"author": {
+		"name": "Alexander Nazarov",
+		"email": "nfokz@yandex.ru"
+	},
+	"bin": {
+		"weaver": "./bin/weaver"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/n4kz/anubseran.git"
+	},
+	"dependencies": {
+		"sprintf": "*",
+		"daemon": "*",
+		"optimist": "*"
+	},
+	"optionalDependencies": {},
+		"engines": {
+		"node": ">=0.6.0"
+	}
+}
