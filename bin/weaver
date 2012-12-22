@@ -9,44 +9,48 @@ var Weaver, daemon, command, server,
 	sprintf  = require('sprintf').sprintf,
 	argv     = optimist
 		.default('port', 8092)
-		.boolean(['help', 'daemon', 'debug'])
+		.boolean(['help', 'debug'])
 		.usage([
 			'$0 [--port <number>] <status|stop|upgrade>',
-			'$0 [--port <number>] [--config <path>] --daemon'
+			'$0 [--port <number>] [--config <path>] [--debug] start'
 		].join('\n'))
 		.describe({
-			daemon : 'Start daemon if it was not started before',
-			config : 'Configuration file. Required to start daemon',
+			config : 'Configuration file. Required to start daemon with predefined tasks',
 			debug  : 'Do not fork and give additional output',
 			help   : 'Show help',
 			port   : 'Use specified port'
 		})
 		.argv;
 
-/* Not enough arguments */
-if (process.argv.length == 2)
-	ok = false;
-
-/* Help requested */
-if (argv.help)
-	ok = false;
-
-/* Config required for daemon */
-if (argv.daemon && !argv.config)
-	ok = false;
-
-/* No command */
-if (!argv.daemon && !argv._.length)
-	ok = false;
-
-/* Daemon can not run command */
-if (argv.daemon && argv._.length)
-	ok = false;
-
 command = argv._[0];
 
+if (command === 'start') {
+	argv.daemon = true;
+	argv._.shift();
+}
+
+/* Not enough arguments */
+if (process.argv.length == 2) {
+	ok = false;
+}
+
+/* Help requested */
+if (argv.help) {
+	ok = false;
+}
+
+/* No command */
+if (!argv.daemon && !argv._.length) {
+	ok = false;
+}
+
+/* Daemon and trailing junk */
+if (argv.daemon && argv._.length) {
+	ok = false;
+}
+
 /* Check command */
-if (!argv.daemon)
+if (!argv.daemon) {
 	switch (command) {
 		case 'upgrade':
 		case 'status':
@@ -57,6 +61,7 @@ if (!argv.daemon)
 		default:
 			ok = false;
 	}
+}
 
 if (!ok) {
 	optimist.showHelp();
@@ -68,8 +73,10 @@ if (argv.daemon) {
 		Weaver = new require('../lib/weaver')(argv.config),
 		server = net.createServer();
 
-	if (!argv.debug)
+	if (!argv.debug) {
 		daemon.start();
+		process.title = 'weaver';
+	}
 
 	/* Signal handlers */
 	process
@@ -112,6 +119,7 @@ if (argv.daemon) {
 
 		switch (command) {
 			case 'status':
+				console.log('Weaver has pid ' + response.pid + ' and uses ' + response.memory + 'K memory');
 				report[command](response);
 				break;
 
@@ -126,7 +134,11 @@ function accept (socket) {
 }
 
 function execute (command) {
-	var result = { status: 'ok' },
+	var result = {
+			status : 'ok',
+			pid    : process.pid,
+			memory : process.memoryUsage().rss >> 10
+		},
 		tasks, task, subtasks, name, i, l, subtask;
 
 	command = command.toString().replace(/[\r\n]+$/, '');
@@ -142,10 +154,12 @@ function execute (command) {
 
 		case 'status':
 			result.tasks = {};
-			tasks = Weaver.tasks;
+			tasks        = Weaver.tasks;
 
 			for (name in tasks) {
-				if (!tasks.hasOwnProperty(name)) continue;
+				if (!tasks.hasOwnProperty(name)) {
+					continue;
+				}
 
 				result.tasks[name] = task = {
 					count    : tasks[name].count,
@@ -169,10 +183,8 @@ function execute (command) {
 			break;
 
 		default:
-			result = {
-				status: 'error',
-				message: 'Unknown command'
-			};
+			result.status  = 'error';
+			result.message = 'Unknown command';
 	}
 
 	this.end(JSON.stringify(result) + '\r\n');
@@ -205,7 +217,7 @@ report.status = function (result) {
 			continue;
 		}
 
-		task = tasks[name];
+		task     = tasks[name];
 		subtasks = task.subtasks;
 
 		for (i = 0, l = subtasks.length; i < l; i++) {
