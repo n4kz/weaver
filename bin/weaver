@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+var red      = '\033[01;31m',
+	green    = '\033[01;32m',
+	yellow   = '\033[01;33m',
+	clear    = '\033[00m';
+
 'use strict';
 
 var Weaver, daemon, command, server,
@@ -9,16 +14,17 @@ var Weaver, daemon, command, server,
 	sprintf  = require('sprintf').sprintf,
 	argv     = optimist
 		.default('port', 8092)
-		.boolean(['help', 'debug'])
+		.boolean(['help', 'debug', 'nocolor'])
 		.usage([
 			'$0 [--port <number>] <status|stop|upgrade>',
 			'$0 [--port <number>] [--config <path>] [--debug] start'
 		].join('\n'))
 		.describe({
-			config : 'Configuration file. Required to start daemon with predefined tasks',
-			debug  : 'Do not fork and give additional output',
-			help   : 'Show help',
-			port   : 'Use specified port'
+			config  : 'Configuration file. Required to start daemon with predefined tasks',
+			debug   : 'Do not fork and give additional output',
+			nocolor : 'Do not use colors for output',
+			help    : 'Show help',
+			port    : 'Use specified port'
 		})
 		.argv;
 
@@ -61,6 +67,14 @@ if (!argv.daemon) {
 		default:
 			ok = false;
 	}
+}
+
+/* Clear colors */
+if (argv.nocolor) {
+	red    = '';
+	green  = '';
+	yellow = '';
+	clear  = '';
 }
 
 if (!ok) {
@@ -119,7 +133,10 @@ if (argv.daemon) {
 
 		switch (command) {
 			case 'status':
-				console.log('Weaver has pid ' + response.pid + ' and uses ' + response.memory + 'K memory');
+				console.log(
+					green + sprintf('%5o', response.pid) + clear +
+					' weaver (' + yellow + response.memory + 'K' + clear + ')'
+				);
 				report[command](response);
 				break;
 
@@ -194,7 +211,7 @@ report.status = function (result) {
 	var tasks   = result.tasks,
 		lname   = 0,
 		lsource = 0,
-		name, task, subtask, subtasks, i, l;
+		name, task, subtask, subtasks, i, l, pid;
 
 	for (name in tasks) {
 		if (!tasks.hasOwnProperty(name)) {
@@ -221,8 +238,13 @@ report.status = function (result) {
 		subtasks = task.subtasks;
 
 		for (i = 0, l = subtasks.length; i < l; i++) {
+			pid = subtasks[i].pid;
+
 			console.log(
-				sprintf('%5o %-' + lname + 's %-' + lsource + 's %s', subtasks[i].pid, name, task.source, subtasks[i].args.join(' '))
+				(pid? green : red) +
+				sprintf('%5o', subtasks[i].pid) +
+				clear +
+				sprintf(' %-' + lname + 's %-' + lsource + 's %s', name, task.source, subtasks[i].args.join(' '))
 			);
 		}
 	}
