@@ -9,6 +9,7 @@ var red      = '\033[01;31m',
 var Weaver, daemon, command, server,
 	ok       = true,
 	net      = require('net'),
+	resolve  = require('path').resolve,
 	optimist = require('optimist'),
 	report   = {},
 	sprintf  = require('sprintf').sprintf,
@@ -16,7 +17,8 @@ var Weaver, daemon, command, server,
 		.default('port', 8092)
 		.boolean(['help', 'debug', 'nocolor'])
 		.usage([
-			'$0 [--port <number>] <status|stop|upgrade>',
+			'$0 [--port <number>] <status|stop>',
+			'$0 [--port <number>] upgrade [path]',
 			'$0 [--port <number>] [--config <path>] [--debug] start'
 		].join('\n'))
 		.describe({
@@ -105,11 +107,20 @@ if (argv.daemon) {
 		.on('connection', accept);
 } else {
 	var response = '',
+		data     = command,
 		socket   = net.connect({
 			port: argv.port
 		});
 
-	socket.once('connect', socket.write.bind(socket, command + '\r\n'));
+	/* Send arguments */
+	if (argv._.length > 1) {
+		if (command === 'upgrade') {
+			data += '\r\n';
+			data += JSON.stringify([resolve(argv._[1])]);
+		}
+	}
+
+	socket.once('connect', socket.write.bind(socket, data + '\r\n'));
 
 	socket.on('error', function (error) {
 		console.log('Could not connect to weaver on port ' + argv.port);
@@ -134,7 +145,7 @@ if (argv.daemon) {
 		switch (command) {
 			case 'status':
 				console.log(
-					green + sprintf('%5o', response.pid) + clear +
+					green + sprintf('%5u', response.pid) + clear +
 					' weaver (' + yellow + response.memory + 'K' + clear + ')'
 				);
 				report[command](response);
@@ -150,15 +161,22 @@ function accept (socket) {
 	socket.once('data', execute);
 }
 
-function execute (command) {
-	var result = {
+function execute (data) {
+	var parameters = data.toString().replace(/[\r\n]+$/, '').split('\r\n', 2),
+		command    = parameters[0],
+		result     = {
 			status : 'ok',
 			pid    : process.pid,
 			memory : process.memoryUsage().rss >> 10
 		},
 		tasks, task, subtasks, name, i, l, subtask;
 
-	command = command.toString().replace(/[\r\n]+$/, '');
+	try {
+		parameters = JSON.parse(parameters[1] || '[]');
+	} catch (error) {
+		Weaver.emit('error', error.message);
+		parameters = [];
+	}
 
 	switch (command) {
 		case 'stop':
@@ -166,6 +184,10 @@ function execute (command) {
 			break;
 
 		case 'upgrade':
+			if (parameters[0]) {
+				Weaver.file = parameters[0];
+			}
+
 			Weaver.config();
 			break;
 
@@ -242,7 +264,7 @@ report.status = function (result) {
 
 			console.log(
 				(pid? green : red) +
-				sprintf('%5o', subtasks[i].pid) +
+				sprintf('%5u', subtasks[i].pid) +
 				clear +
 				sprintf(' %-' + lname + 's %-' + lsource + 's %s', name, task.source, subtasks[i].args.join(' '))
 			);
