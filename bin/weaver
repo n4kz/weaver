@@ -5,9 +5,15 @@ var Weaver, daemon, command, server,
 	ok       = true,
 	net      = require('net'),
 	optimist = require('optimist'),
+	report   = {},
+	sprintf  = require('sprintf').sprintf,
 	argv     = optimist
 		.default('port', 8092)
 		.boolean(['help', 'daemon', 'debug'])
+		.usage([
+			'$0 [--port <number>] <status|stop|upgrade>',
+			'$0 [--port <number>] [--config <path>] --daemon'
+		].join('\n'))
 		.describe({
 			daemon : 'Start daemon if it was not started before',
 			config : 'Configuration file. Required to start daemon',
@@ -76,6 +82,43 @@ if (argv.daemon) {
 	server
 		.listen(argv.port, 'localhost')
 		.on('connection', accept);
+} else {
+	var response = '',
+		socket   = net.connect({
+			port: argv.port
+		});
+
+	socket.once('connect', socket.write.bind(socket, command + '\r\n'));
+
+	socket.on('error', function (error) {
+		console.log('Could not connect to weaver on port ' + argv.port);
+	});
+
+	socket.on('data', function (data) {
+		if (data instanceof Buffer) {
+			data = data.toString();
+		}
+
+		response += data;
+	});
+
+	socket.once('end', function () {
+		response = JSON.parse(response);
+
+		if (response.status !== 'ok') {
+			console.warn(response.message);
+			return;
+		}
+
+		switch (command) {
+			case 'status':
+				report[command](response);
+				break;
+
+			default:
+				console.dir(response);
+		}
+	});
 }
 
 function accept (socket) {
@@ -134,5 +177,43 @@ function execute (command) {
 
 	this.end(JSON.stringify(result) + '\r\n');
 }
+
+report.status = function (result) {
+	var tasks   = result.tasks,
+		lname   = 0,
+		lsource = 0,
+		name, task, subtask, subtasks, i, l;
+
+	for (name in tasks) {
+		if (!tasks.hasOwnProperty(name)) {
+			continue;
+		}
+
+		/* Find longest name */
+		if (name.length > lname) {
+			lname = name.length;
+		}
+
+		/* Find longest source */
+		if (tasks[name].source.length > lsource) {
+			lsource = tasks[name].source.length;
+		}
+	}
+
+	for (name in tasks) {
+		if (!tasks.hasOwnProperty(name)) {
+			continue;
+		}
+
+		task = tasks[name];
+		subtasks = task.subtasks;
+
+		for (i = 0, l = subtasks.length; i < l; i++) {
+			console.log(
+				sprintf('%5o %-' + lname + 's %-' + lsource + 's %s', subtasks[i].pid, name, task.source, subtasks[i].args.join(' '))
+			);
+		}
+	}
+};
 
 /* vim: set ft=javascript : */
