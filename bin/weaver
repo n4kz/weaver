@@ -18,12 +18,11 @@ var Weaver, daemon, command, server,
 		.boolean(['help', 'debug', 'nocolor'])
 		.usage([
 			'$0 [--port <number>] <status|stop>',
-			'$0 [--port <number>] upgrade [path]',
-			'$0 [--port <number>] [--config <path>] [--debug] start'
+			'$0 [--port <number>] [--config <path>] [--debug] <upgrade|start>'
 		].join('\n'))
 		.describe({
 			config  : 'Configuration file. Required to start daemon with predefined tasks',
-			debug   : 'Do not fork and give additional output',
+			debug   : 'Do not fork and give additional output. Makes sense only for start',
 			nocolor : 'Do not use colors for output',
 			help    : 'Show help',
 			port    : 'Use specified port'
@@ -34,7 +33,6 @@ command = argv._[0];
 
 if (command === 'start') {
 	argv.daemon = true;
-	argv._.shift();
 }
 
 /* Not enough arguments */
@@ -47,13 +45,8 @@ if (argv.help) {
 	ok = false;
 }
 
-/* No command */
-if (!argv.daemon && !argv._.length) {
-	ok = false;
-}
-
-/* Daemon and trailing junk */
-if (argv.daemon && argv._.length) {
+/* No command or trailing junk */
+if (argv._.length !== 1) {
 	ok = false;
 }
 
@@ -89,6 +82,11 @@ if (argv.daemon) {
 		Weaver = new require('../lib/weaver')(argv.config),
 		server = net.createServer();
 
+	Weaver.log = function () {
+		console.warn(red + Array.prototype.slice.call(arguments) + clear);
+	};
+
+	/* Debug mode */
 	if (!argv.debug) {
 		daemon.start();
 		process.title = 'weaver';
@@ -113,11 +111,9 @@ if (argv.daemon) {
 		});
 
 	/* Send arguments */
-	if (argv._.length > 1) {
-		if (command === 'upgrade') {
-			data += '\r\n';
-			data += JSON.stringify([resolve(argv._[1])]);
-		}
+	if (command === 'upgrade' && argv.config) {
+		data += '\r\n';
+		data += JSON.stringify([resolve(argv.config)]);
 	}
 
 	socket.once('connect', socket.write.bind(socket, data + '\r\n'));
