@@ -18,10 +18,9 @@ var Weaver, daemon, command, server,
 		.boolean(['help', 'debug', 'nocolor'])
 		.usage([
 			'$0 [--port <number>] [--config <path>] [--debug] [start]',
-			'$0 [--port <number>] [--config <path>] [--debug] look',
-			'$0 [--port <number>] restart <task>',
-			'$0 [--port <number>] status',
-			'$0 [--port <number>] exit'
+			'$0 [--port <number>] [--config <path>] [--debug] upgrade',
+			'$0 [--port <number>] <restart|stop> [[task|pid], ...]',
+			'$0 [--port <number>] <status|exit>'
 		].join('\n'))
 		.describe({
 			config  : 'Configuration file. Required to start daemon with predefined tasks',
@@ -46,15 +45,19 @@ if (argv.help) {
 /* Check command */
 if (!argv.daemon) {
 	switch (command) {
+		case 'stop':
 		case 'restart':
 			if (argv._.length === 1) {
 				ok = false;
 			}
 			break;
 
-		case 'look':
+		case 'upgrade':
 		case 'status':
 		case 'exit':
+			if (argv._.length !== 1) {
+				ok = false;
+			}
 			break;
 
 		default:
@@ -110,13 +113,14 @@ if (argv.daemon) {
 
 	/* Send arguments */
 	switch (command) {
-		case 'look':
+		case 'upgrade':
 			if (argv.config) {
 				data += '\r\n';
 				data += JSON.stringify([resolve(argv.config)]);
 			}
 			break;
 
+		case 'stop':
 		case 'restart':
 			data += '\r\n';
 			data += JSON.stringify(argv._.slice(1));
@@ -170,32 +174,45 @@ function execute (data) {
 			pid    : process.pid,
 			memory : process.memoryUsage().rss >> 10
 		},
-		task, subtasks, name, i, l, subtask;
+		task, subtasks, name, i, l, subtask, pid;
 
 	try {
 		parameters = JSON.parse(parameters[1] || '[]');
 	} catch (error) {
-		Weaver.emit('error', error.message);
+		error.message = 'Client error: ' + error.message;
+		Weaver.emit('error', error);
 		parameters = [];
 	}
 
 	switch (command) {
+		case 'stop':
 		case 'restart':
+			/* TODO: Move this to weaver.js */
 			for (i = 0, l = parameters.length; i < l; i++) {
-				name = parameters[i];
+				name = String(parameters[i]);
 
 				if (tasks.hasOwnProperty(name)) {
-					tasks[name].refresh();
+					tasks[name][command]();
+				}
+
+				if (name.match(/^\d+$/)) {
+					pid = Number(name);
+					for (name in tasks) {
+						if (tasks.hasOwnProperty(name)) {
+							tasks[name][command](pid);
+						}
+					}
 				}
 			}
 
+			Weaver.config();
 			break;
 
 		case 'exit':
 			Weaver.die();
 			break;
 
-		case 'look':
+		case 'upgrade':
 			if (parameters[0]) {
 				Weaver.file = parameters[0];
 			}
@@ -204,6 +221,7 @@ function execute (data) {
 			break;
 
 		case 'status':
+			/* TODO: Move this to weaver.js */
 			result.tasks = {};
 
 			for (name in tasks) {
