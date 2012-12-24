@@ -17,8 +17,11 @@ var Weaver, daemon, command, server,
 		.default('port', 8092)
 		.boolean(['help', 'debug', 'nocolor'])
 		.usage([
-			'$0 [--port <number>] <status|stop>',
-			'$0 [--port <number>] [--config <path>] [--debug] <upgrade|start>'
+			'$0 [--port <number>] [--config <path>] [--debug] [start]',
+			'$0 [--port <number>] [--config <path>] [--debug] look',
+			'$0 [--port <number>] restart <task>',
+			'$0 [--port <number>] status',
+			'$0 [--port <number>] exit'
 		].join('\n'))
 		.describe({
 			config  : 'Configuration file. Required to start daemon with predefined tasks',
@@ -29,15 +32,10 @@ var Weaver, daemon, command, server,
 		})
 		.argv;
 
-command = argv._[0];
+command = argv._[0] || 'start';
 
 if (command === 'start') {
 	argv.daemon = true;
-}
-
-/* Not enough arguments */
-if (process.argv.length == 2) {
-	ok = false;
 }
 
 /* Help requested */
@@ -45,18 +43,18 @@ if (argv.help) {
 	ok = false;
 }
 
-/* No command or trailing junk */
-if (argv._.length !== 1) {
-	ok = false;
-}
-
 /* Check command */
 if (!argv.daemon) {
 	switch (command) {
-		case 'upgrade':
+		case 'restart':
+			if (argv._.length === 1) {
+				ok = false;
+			}
+			break;
+
+		case 'look':
 		case 'status':
-		case 'stop':
-			/* TODO: check command arguments */
+		case 'exit':
 			break;
 
 		default:
@@ -111,9 +109,18 @@ if (argv.daemon) {
 		});
 
 	/* Send arguments */
-	if (command === 'upgrade' && argv.config) {
-		data += '\r\n';
-		data += JSON.stringify([resolve(argv.config)]);
+	switch (command) {
+		case 'look':
+			if (argv.config) {
+				data += '\r\n';
+				data += JSON.stringify([resolve(argv.config)]);
+			}
+			break;
+
+		case 'restart':
+			data += '\r\n';
+			data += JSON.stringify(argv._.slice(1));
+			break;
 	}
 
 	socket.once('connect', socket.write.bind(socket, data + '\r\n'));
@@ -146,9 +153,6 @@ if (argv.daemon) {
 				);
 				report[command](response);
 				break;
-
-			default:
-				console.dir(response);
 		}
 	});
 }
@@ -160,12 +164,13 @@ function accept (socket) {
 function execute (data) {
 	var parameters = data.toString().replace(/[\r\n]+$/, '').split('\r\n', 2),
 		command    = parameters[0],
+		tasks      = Weaver.tasks,
 		result     = {
 			status : 'ok',
 			pid    : process.pid,
 			memory : process.memoryUsage().rss >> 10
 		},
-		tasks, task, subtasks, name, i, l, subtask;
+		task, subtasks, name, i, l, subtask;
 
 	try {
 		parameters = JSON.parse(parameters[1] || '[]');
@@ -175,11 +180,22 @@ function execute (data) {
 	}
 
 	switch (command) {
-		case 'stop':
+		case 'restart':
+			for (i = 0, l = parameters.length; i < l; i++) {
+				name = parameters[i];
+
+				if (tasks.hasOwnProperty(name)) {
+					tasks[name].refresh();
+				}
+			}
+
+			break;
+
+		case 'exit':
 			Weaver.die();
 			break;
 
-		case 'upgrade':
+		case 'look':
 			if (parameters[0]) {
 				Weaver.file = parameters[0];
 			}
@@ -189,7 +205,6 @@ function execute (data) {
 
 		case 'status':
 			result.tasks = {};
-			tasks        = Weaver.tasks;
 
 			for (name in tasks) {
 				if (!tasks.hasOwnProperty(name)) {
@@ -208,9 +223,10 @@ function execute (data) {
 				for (i = 0, l = subtasks.length; i < l; i++) {
 					subtask = subtasks[i];
 					task.subtasks.push(subtask? {
-						pid  : subtask.pid,
-						args : subtask.args,
-						time : subtask.time
+						pid    : subtask.pid,
+						args   : subtask.args,
+						status : subtask.status,
+						time   : subtask.time
 					} : null);
 				}
 			}
@@ -229,7 +245,7 @@ report.status = function (result) {
 	var tasks   = result.tasks,
 		lname   = 0,
 		lsource = 0,
-		name, task, subtask, subtasks, i, l, pid;
+		name, task, subtask, subtasks, i, l, pid, status, color;
 
 	for (name in tasks) {
 		if (!tasks.hasOwnProperty(name)) {
@@ -257,11 +273,29 @@ report.status = function (result) {
 
 		for (i = 0, l = subtasks.length; i < l; i++) {
 			pid = subtasks[i].pid;
+			status = subtasks[i].status;
+
+			switch (status) {
+				case 'D':
+				case 'W':
+					color = green;
+					break;
+
+				case 'S':
+				case 'R':
+				case 'N':
+					color = yellow;
+					break;
+
+				default:
+					color = red;
+			}
 
 			console.log(
-				(pid? green : red) +
+				color +
 				sprintf('%5u', subtasks[i].pid) +
 				clear +
+				(color? '' : ' ' + status) +
 				sprintf(' %-' + lname + 's %-' + lsource + 's %s', name, task.source, subtasks[i].args.join(' '))
 			);
 		}
