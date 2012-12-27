@@ -47,9 +47,6 @@ if (!argv.daemon) {
 	switch (command) {
 		case 'stop':
 		case 'restart':
-			if (argv._.length === 1) {
-				ok = false;
-			}
 			break;
 
 		case 'upgrade':
@@ -202,6 +199,15 @@ function execute (data) {
 						if (tasks.hasOwnProperty(name)) {
 							tasks[name][command](pid);
 						}
+					}
+				}
+			}
+
+			/* Restart/stop all */
+			if (!parameters.length) {
+				for (name in tasks) {
+					if (tasks.hasOwnProperty(name)) {
+						tasks[name][command]();
 					}
 				}
 			}
