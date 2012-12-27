@@ -90,6 +90,7 @@ if (argv.daemon) {
 	/* Debug mode */
 	if (!argv.debug) {
 		daemon.start();
+		process.chdir('/');
 		process.title = 'weaver';
 	}
 
