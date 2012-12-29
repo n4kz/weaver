@@ -17,10 +17,27 @@ var Weaver, daemon, command, server,
 		.default('port', 8092)
 		.boolean(['help', 'debug', 'nocolor'])
 		.usage([
-			'$0 [--port <number>] [--config <path>] [--debug] [start]',
-			'$0 [--port <number>] [--config <path>] [--debug] upgrade',
-			'$0 [--port <number>] <restart|stop> [[task|pid], ...]',
-			'$0 [--port <number>] <status|exit>'
+			'Usage:',
+			'    $0 [--port <number>] [--config <path>] [--debug] [start]',
+			'    $0 [--port <number>] [--config <path>] [--debug] upgrade',
+			'    $0 [--port <number>] <restart|stop> [[task|pid], ...]',
+			'    $0 [--port <number>] [--nocolor] status',
+			'    $0 [--port <number>] exit',
+			'',
+			'Commands:',
+			'    start',
+			'        Start daemon if it was not started before',
+			'    upgrade',
+			'        Change or re-read config file',
+			'    restart',
+			'        Restart all tasks, task group, task by pid',
+			'    stop',
+			'        Stop all tasks, task group, task by pid',
+			'    status',
+			'        Show status for all tasks',
+			'    exit',
+			'        Stop all tasks and exit',
+			''
 		].join('\n'))
 		.describe({
 			config  : 'Configuration file. Required to start daemon with predefined tasks',

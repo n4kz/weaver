@@ -5,7 +5,7 @@
 	"main": "./lib/weaver.js",
 	"author": {
 		"name": "Alexander Nazarov",
-		"email": "nfokz@yandex.ru"
+		"email": "n4kz@n4kz.com"
 	},
 	"bin": {
 		"weaver": "./bin/weaver"
