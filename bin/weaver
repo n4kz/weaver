@@ -94,7 +94,7 @@ if (!ok) {
 
 if (argv.daemon) {
 	var daemon = require('daemon'),
-		Weaver = new require('../lib/weaver')(argv.config),
+		Weaver = new require('../lib/weaver')(resolve(argv.config)),
 		server = net.createServer();
 
 	Weaver.log = function () {
@@ -104,9 +104,10 @@ if (argv.daemon) {
 	/* Debug mode */
 	if (!argv.debug) {
 		daemon.start();
-		process.chdir('/');
-		process.title = 'weaver';
 	}
+
+	process.chdir('/');
+	process.title = 'weaver';
 
 	/* Signal handlers */
 	process
