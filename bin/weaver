@@ -21,18 +21,21 @@ var Weaver, daemon, command, server,
 			'    weaver [--port <number>] [--config <path>] [--debug] [start]',
 			'    weaver [--port <number>] [--config <path>] upgrade',
 			'    weaver [--port <number>] <restart|stop> [[task|pid], ...]',
+			'    weaver [--port <number>] kill <signal> [[task|pid], ...]',
 			'    weaver [--port <number>] [--nocolor] status',
 			'    weaver [--port <number>] exit',
 			'',
 			'Commands:',
 			'    start',
-			'        Start daemon if it was not started before',
+			'        Start daemon if it was not started before. Default command',
 			'    upgrade',
 			'        Change or re-read config file',
 			'    restart',
 			'        Restart all tasks, task group, task by pid',
 			'    stop',
 			'        Stop all tasks, task group, task by pid',
+			'    kill',
+			'        Send signal to task group or task by pid',
 			'    status',
 			'        Show status for all tasks',
 			'    exit',
@@ -62,6 +65,12 @@ if (argv.help) {
 /* Check command */
 if (!argv.daemon) {
 	switch (command) {
+		case 'kill':
+			if (!argv._.length) {
+				ok = false;
+			}
+			break;
+
 		case 'stop':
 		case 'restart':
 			break;
@@ -137,8 +146,15 @@ if (argv.daemon) {
 			}
 			break;
 
+		case 'kill':
 		case 'stop':
 		case 'restart':
+			if (command === 'kill') {
+				argv._[1] = argv._[1]
+					.replace(/^(?!sig)/, 'sig')
+					.toUpperCase()
+			}
+
 			data += '\r\n';
 			data += JSON.stringify(argv._.slice(1));
 			break;
@@ -191,7 +207,7 @@ function execute (data) {
 			pid    : process.pid,
 			memory : process.memoryUsage().rss >> 10
 		},
-		name, i, l, pid;
+		name, i, l, pid, args = [];
 
 	try {
 		parameters = JSON.parse(parameters[1] || '[]');
@@ -202,21 +218,26 @@ function execute (data) {
 	}
 
 	switch (command) {
+		case 'kill':
 		case 'stop':
 		case 'restart':
+			if (command === 'kill') {
+				args.push(parameters.shift());
+			}
+
 			/* TODO: Move this to weaver.js */
 			for (i = 0, l = parameters.length; i < l; i++) {
 				name = String(parameters[i]);
 
 				if (tasks.hasOwnProperty(name)) {
-					tasks[name][command]();
+					tasks[name][command].apply(tasks[name], args);
 				}
 
 				if (name.match(/^\d+$/)) {
 					pid = Number(name);
 					for (name in tasks) {
 						if (tasks.hasOwnProperty(name)) {
-							tasks[name][command](pid);
+							tasks[name][command].apply(tasks[name], [pid].concat(args));
 						}
 					}
 				}
@@ -226,7 +247,7 @@ function execute (data) {
 			if (!parameters.length) {
 				for (name in tasks) {
 					if (tasks.hasOwnProperty(name)) {
-						tasks[name][command]();
+						tasks[name][command].apply(tasks[name], args);
 					}
 				}
 			}
