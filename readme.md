@@ -81,7 +81,7 @@ and to stop worker
 
 	weaver stop worker
 
-Processes in web group get different command line arguments but similar environment. By default tasks have access to PATH, NODE_PATH and HOME
+Processes in the web group get different command line arguments but similar environment. By default tasks have access to PATH, NODE_PATH and HOME
 environment variables.
 
 Bash commands to start processes manually in same way as weaver does in example above
@@ -105,7 +105,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 		Source file for task group
 
 	persistent
-		Restart task on unclean exit. Optional
+		Restart task on unclean exit. Defaults to false. Boolean. Optional
 
 	arguments
 		Arguments for tasks in task group. Nested array should have length equal to task count. Optional
@@ -118,3 +118,6 @@ Bash commands to start processes manually in same way as weaver does in example 
 
 	timeout
 		Timeout between SIGINT and SIGTERM for stop and restart commands. Defaults to 1000ms. Optional
+
+	cwd
+		Task group working directory. Defaults to path. Optional

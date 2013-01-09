@@ -212,47 +212,37 @@ function execute (data) {
 	try {
 		parameters = JSON.parse(parameters[1] || '[]');
 	} catch (error) {
+		result.status = 'error';
+		result.message = error.message;
 		error.message = 'Client error: ' + error.message;
+
 		Weaver.emit('error', error);
-		parameters = [];
+		this.end(JSON.stringify(result) + '\r\n');
+		return;
 	}
 
 	switch (command) {
 		case 'kill':
 		case 'stop':
 		case 'restart':
+			/* Push signal name to args */
 			if (command === 'kill') {
 				args.push(parameters.shift());
 			}
 
-			/* TODO: Move this to weaver.js */
+			/* name/pid */
 			for (i = 0, l = parameters.length; i < l; i++) {
 				name = String(parameters[i]);
 
-				if (tasks.hasOwnProperty(name)) {
-					tasks[name][command].apply(tasks[name], args);
-				}
-
-				if (name.match(/^\d+$/)) {
-					pid = Number(name);
-					for (name in tasks) {
-						if (tasks.hasOwnProperty(name)) {
-							tasks[name][command].apply(tasks[name], [pid].concat(args));
-						}
-					}
-				}
+				Weaver[command].call(null, name, args);
 			}
 
-			/* Restart/stop all */
+			/* all */
 			if (!parameters.length) {
-				for (name in tasks) {
-					if (tasks.hasOwnProperty(name)) {
-						tasks[name][command].apply(tasks[name], args);
-					}
-				}
+				Weaver[command].call(null, null, args);
 			}
 
-			Weaver.config();
+			Weaver.check();
 			break;
 
 		case 'exit':
