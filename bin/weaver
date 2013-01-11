@@ -118,7 +118,7 @@ if (argv.daemon) {
 		};
 	}
 
-	Weaver = new require('../lib/weaver')(resolve(argv.config));
+	Weaver = new require('../lib/weaver')(argv.config? resolve(argv.config) : undefined);
 
 	/* Start daemon */
 	if (!argv.debug) {
@@ -146,10 +146,7 @@ if (argv.daemon) {
 } else {
 	var response = '',
 		data     = command,
-		socket   = net.connect({
-			host: 'localhost',
-			port: argv.port
-		});
+		socket   = net.connect(argv.port);
 
 	/* Send arguments */
 	switch (command) {
