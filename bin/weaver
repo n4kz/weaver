@@ -54,7 +54,8 @@ var Weaver, daemon, command, server,
 command = argv._[0] || 'start';
 
 if (command === 'start') {
-	argv.daemon = true;
+	argv.daemon  = true;
+	argv.nocolor = true;
 }
 
 /* Help requested */
@@ -103,20 +104,33 @@ if (!ok) {
 
 if (argv.daemon) {
 	var daemon = require('daemon'),
-		Weaver = new require('../lib/weaver')(resolve(argv.config)),
-		server = net.createServer();
+		udp    = require('dgram').createSocket('udp4');
 
-	Weaver.log = function () {
-		console.warn(red + Array.prototype.slice.call(arguments) + clear);
-	};
+	/* Send stdout and stderr to udp */
+	if (!argv.debug) {
+		process.stderr.write =
+		process.stdout.write = function (data, encoding) {
+			if (!(data instanceof Buffer)) {
+				data = new Buffer(data, encoding);
+			}
 
-	/* Debug mode */
+			udp.send(data, 0, data.length, argv.port, 'localhost');
+		};
+	}
+
+	Weaver = new require('../lib/weaver')(resolve(argv.config));
+
+	/* Start daemon */
 	if (!argv.debug) {
 		daemon.start();
 	}
 
 	process.chdir('/');
 	process.title = 'weaver [' + argv.port + ']';
+
+	Weaver.log = function () {
+		console.log(process.pid + ' (weaver) ' + Array.prototype.join.call(arguments, ''));
+	};
 
 	/* Signal handlers */
 	process
@@ -126,7 +140,7 @@ if (argv.daemon) {
 		.on('SIGHUP',  Weaver.config);
 
 	/* Setup control interface */
-	server
+	net.createServer()
 		.listen(argv.port, 'localhost')
 		.on('connection', accept);
 } else {
