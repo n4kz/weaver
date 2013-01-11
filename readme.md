@@ -13,13 +13,13 @@ Interactive process management system for node.js
 
 # Commands
 
-	- `start`   Start daemon if it was not started before. Default command
-	- `upgrade` Change or re-read config file
-	- `restart` Restart all tasks, task group, task by pid
-	- `stop`    Stop all tasks, task group, task by pid
-	- `kill`    Send signal to task group or task by pid
-	- `status`  Show status for all tasks
-	- `exit`    Stop all tasks and exit
+- `start`   Start daemon if it was not started before. Default command
+- `upgrade` Change or re-read config file
+- `restart` Restart all tasks, task group, task by pid
+- `stop`    Stop all tasks, task group, task by pid
+- `kill`    Send signal to task group or task by pid
+- `status`  Show status for all tasks
+- `exit`    Stop all tasks and exit
 
 # Options
 
@@ -79,16 +79,16 @@ Bash commands to start processes manually in same way as weaver does in example 
 
 # Configuration file structure
 
-	- `path`       Path to working directory, relative to configuration file or absolute
-	- `tasks`      Task groups
-	- `count`      Task count for group
-	- `source`     Source file for task group
-	- `persistent` Restart task on unclean exit. Defaults to false. Boolean. Optional
-	- `arguments`  Arguments for tasks in task group. Nested array should have length equal to task count. Optional
-	- `env`        Environment variables for task group. Optional
-	- `watch`      Restart all tasks in task group when one of watched files was modified. Optional
-	- `timeout`    Timeout between SIGINT and SIGTERM for stop and restart commands. Defaults to 1000ms. Optional
-	- `cwd`        Task group working directory. Defaults to path. Optional
+- `path`       Path to working directory, relative to configuration file or absolute
+- `tasks`      Task groups
+- `count`      Task count for group
+- `source`     Source file for task group
+- `persistent` Restart task on unclean exit. Defaults to false. Boolean. Optional
+- `arguments`  Arguments for tasks in task group. Nested array should have length equal to task count. Optional
+- `env`        Environment variables for task group. Optional
+- `watch`      Restart all tasks in task group when one of watched files was modified. Optional
+- `timeout`    Timeout between SIGINT and SIGTERM for stop and restart commands. Defaults to 1000ms. Optional
+- `cwd`        Task group working directory. Defaults to path. Optional
 
 # Logs
 
