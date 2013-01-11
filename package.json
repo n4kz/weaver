@@ -1,6 +1,6 @@
 {
 	"name": "weaver",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Interactive process management system",
 	"main": "./lib/weaver.js",
 	"author": {
@@ -20,8 +20,7 @@
 		"daemon": "*",
 		"optimist": "*"
 	},
-	"optionalDependencies": {},
-		"engines": {
+	"engines": {
 		"node": ">=0.6.0"
 	}
 }
