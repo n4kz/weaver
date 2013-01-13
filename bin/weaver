@@ -322,7 +322,6 @@ report.status = function (result) {
 
 				case 'S':
 				case 'R':
-				case 'N':
 					color = yellow;
 					break;
 
