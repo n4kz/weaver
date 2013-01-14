@@ -1,6 +1,6 @@
 {
 	"name": "weaver",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "Interactive process management system",
 	"main": "lib/weaver.js",
 	"author": {
