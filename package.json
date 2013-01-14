@@ -2,13 +2,13 @@
 	"name": "weaver",
 	"version": "0.0.4",
 	"description": "Interactive process management system",
-	"main": "./lib/weaver.js",
+	"main": "lib/weaver.js",
 	"author": {
 		"name": "Alexander Nazarov",
 		"email": "n4kz@n4kz.com"
 	},
 	"bin": {
-		"weaver": "./bin/weaver"
+		"weaver": "bin/weaver"
 	},
 	"repository": {
 		"type": "git",

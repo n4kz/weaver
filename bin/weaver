@@ -263,7 +263,7 @@ function execute (data) {
 			break;
 
 		case 'exit':
-			Weaver.die();
+			Weaver.die(0);
 			break;
 
 		case 'upgrade':
