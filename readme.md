@@ -1,6 +1,19 @@
 # Weaver
 
-Interactive process management system for node.js
+Interactive process management system for node.js 
+
+# Installation
+
+```bash
+    # Global
+    npm -g install weaver
+    
+    # Local
+    npm install weaver
+```
+
+If you have choosen local installation, check your `$PATH` environment variable. `npm` creates symlinks to
+all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it to `$PATH`.
 
 # Usage
 
