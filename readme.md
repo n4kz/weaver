@@ -27,6 +27,7 @@ Interactive process management system for node.js
 	--debug    Do not fork and give additional output. Makes sense only for start  [boolean]
 	--nocolor  Do not use colors for output                                        [boolean]
 	--help     Show help                                                           [boolean]
+	--version  Show version                                                        [boolean]
 	--port     Use specified port                                                  [default: 8092]
 
 # Configuration example

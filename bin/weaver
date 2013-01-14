@@ -15,7 +15,7 @@ var Weaver, daemon, command, server,
 	sprintf  = require('sprintf').sprintf,
 	argv     = optimist
 		.default('port', 8092)
-		.boolean(['help', 'debug', 'nocolor'])
+		.boolean(['help', 'debug', 'nocolor', 'version'])
 		.usage([
 			'Usage:',
 			'    weaver [--port <number>] [--config <path>] [--debug] [start]',
@@ -46,7 +46,8 @@ var Weaver, daemon, command, server,
 			config  : 'Configuration file. Required to start daemon with predefined tasks',
 			debug   : 'Do not fork and give additional output. Makes sense only for start',
 			nocolor : 'Do not use colors for output',
-			help    : 'Show help',
+			help    : 'Show help and exit',
+			version : 'Show version and exit',
 			port    : 'Use specified port'
 		})
 		.argv;
@@ -61,6 +62,11 @@ if (command === 'start') {
 /* Help requested */
 if (argv.help) {
 	ok = false;
+}
+
+if (argv.version) {
+	console.log('0.0.4');
+	process.exit();
 }
 
 /* Check command */
