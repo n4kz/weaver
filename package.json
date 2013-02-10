@@ -1,6 +1,6 @@
 {
 	"name": "weaver",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "Interactive process management system",
 	"main": "lib/weaver.js",
 	"license": "LGPLv3",

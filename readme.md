@@ -12,7 +12,7 @@ Interactive process management system for node.js
     npm install weaver
 ```
 
-If you have choosen local installation, check your `$PATH` environment variable. `npm` creates symlinks to
+If you have chosen local installation, check your `$PATH` environment variable. `npm` creates symlinks to
 all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it to `$PATH`.
 
 # Usage
