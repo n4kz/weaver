@@ -69,12 +69,20 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 				"env": {
 					"NODE_ENV": "local"
 				}
+			},
+
+			"redis": {
+				"count": 1,
+				"source": "redis-cli",
+				"executable": true,
+				"arguments": ["monitor"]
 			}
 		}
 	}
 
-With such config file weaver will run three processes and restart them when one of watched files is modified.
-Processes are organized in two groups and can be managed by group name. For example to restart web processes you need to say
+With such config file weaver will run three processes and restart them when one of watched files is modified. Fourth process will
+send commands from redis in monitor mode to log. Processes are organized in three groups and can be managed by group name.
+For example to restart web processes you need to say
 
 	weaver restart web
 
@@ -90,6 +98,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 	NODE_ENV="local" node ../lib/main.js --web --port 8001
 	NODE_ENV="local" node ../lib/main.js --web --port 8002
 	NODE_ENV="local" node ../lib/main.js --worker
+	redis-cli monitor
 
 # Configuration file structure
 
@@ -98,6 +107,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 - `count`      Task count for group
 - `source`     Source file for task group
 - `persistent` Restart task on unclean exit. Defaults to false. Boolean. Optional
+- `executable` Source is executable itself and v8 instance is not needed to run it. Defaults to false. Boolean. Optional
 - `arguments`  Arguments for tasks in task group. Nested array should have length equal to task count. Optional
 - `env`        Environment variables for task group. Optional
 - `watch`      Restart all tasks in task group when one of watched files was modified. Optional
