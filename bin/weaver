@@ -65,7 +65,7 @@ if (argv.help) {
 }
 
 if (argv.version) {
-	console.log('0.0.5');
+	console.log(require('../package').version);
 	process.exit();
 }
 
@@ -109,17 +109,13 @@ if (!ok) {
 }
 
 if (argv.daemon) {
-	var daemon = require('daemon'),
-		udp    = require('dgram').createSocket('udp4');
+	var udp = require('dgram').createSocket('udp4'),
+		log = console.log;
 
 	/* Send stdout and stderr to udp */
 	if (!argv.debug) {
-		process.stderr.write =
-		process.stdout.write = function (data, encoding) {
-			if (!(data instanceof Buffer)) {
-				data = new Buffer(data, encoding);
-			}
-
+		log = function (data) {
+			data = new Buffer(data + '\n');
 			udp.send(data, 0, data.length, argv.port, 'localhost');
 		};
 	}
@@ -128,14 +124,20 @@ if (argv.daemon) {
 
 	/* Start daemon */
 	if (!argv.debug) {
-		daemon.start();
+		require('daemon').start();
 	}
 
 	process.chdir('/');
 	process.title = 'weaver [' + argv.port + ']';
 
-	Weaver.log = function () {
-		console.log(process.pid + ' (weaver) ' + Array.prototype.join.call(arguments, ''));
+	Weaver.log = function (message) {
+		if (this === Weaver) {
+			message = process.pid + ' (weaver) ' + message;
+		} else {
+			message = message.slice(0, message.length - 1);
+		}
+
+		log(message);
 	};
 
 	/* Signal handlers */
@@ -181,6 +183,7 @@ if (argv.daemon) {
 
 	socket.on('error', function (error) {
 		console.log('Could not connect to weaver on port ' + argv.port);
+		process.exit(1);
 	});
 
 	socket.on('data', function (data) {
