@@ -108,7 +108,16 @@ Bash commands to start processes manually in same way as weaver does in example 
 
 Weaver will collect logs for you and send anything from subtasks stdout and stderr to udp4:localhost:8092 (or any other port of your choice).
 In debug mode this functionality is disabled and logs are printed to stdout.
-To use this logs in someway you should say something like
+To do something with this logs you can simply say
 
     socat udp4-listen:8092 stdout
 
+
+# Copyright and License
+
+Copyright 2012, 2013 Alexander Nazarov. All rights reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
