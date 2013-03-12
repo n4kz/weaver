@@ -23,6 +23,7 @@ var Weaver, daemon, command, server,
 			'    weaver [--port <number>] <restart|stop> [[task|pid], ...]',
 			'    weaver [--port <number>] kill <signal> [[task|pid], ...]',
 			'    weaver [--port <number>] [--nocolor] status',
+			'    weaver [--port <number>] [--nocolor] dump',
 			'    weaver [--port <number>] exit',
 			'',
 			'Commands:',
@@ -38,6 +39,8 @@ var Weaver, daemon, command, server,
 			'        Send signal to task group or task by pid',
 			'    status',
 			'        Show status for all tasks',
+			'    dump',
+			'        Show current weaver configuration',
 			'    exit',
 			'        Stop all tasks and exit',
 			''
@@ -84,6 +87,7 @@ if (!argv.daemon) {
 
 		case 'upgrade':
 		case 'status':
+		case 'dump':
 		case 'exit':
 			if (argv._.length !== 1) {
 				ok = false;
@@ -208,6 +212,8 @@ if (argv.daemon) {
 					green + sprintf('%5u', response.pid) + clear +
 					' weaver (' + yellow + response.memory + 'K' + clear + ')'
 				);
+
+			case 'dump':
 				report[command](response);
 				break;
 		}
@@ -275,6 +281,10 @@ function execute (data) {
 			}
 
 			Weaver.config();
+			break;
+
+		case 'dump':
+			result.config = Weaver.parameters;
 			break;
 
 		case 'status':
@@ -347,6 +357,12 @@ report.status = function (result) {
 			);
 		}
 	}
+};
+
+report.dump = function (result) {
+	var inspect = require('util').inspect;
+
+	console.log(inspect(result.config, false, null, !argv.nocolor));
 };
 
 /* vim: set ft=javascript : */

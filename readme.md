@@ -12,8 +12,8 @@ Interactive process management system for node.js
     npm install weaver
 ```
 
-If you have chosen local installation, check your `$PATH` environment variable. `npm` creates symlinks to
-all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it to `$PATH`.
+If you have chosen local installation, check your `PATH` environment variable. `npm` creates symlinks to
+all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it to `PATH`.
 
 # Usage
 
@@ -22,6 +22,7 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
     weaver [--port <number>] <restart|stop> [[task|pid], ...]
     weaver [--port <number>] kill <signal> [[task|pid], ...]
     weaver [--port <number>] [--nocolor] status
+    weaver [--port <number>] [--nocolor] dump
     weaver [--port <number>] exit
 
 # Commands
@@ -32,6 +33,7 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 - `stop`    Stop all tasks, task group, task by pid
 - `kill`    Send signal to task group or task by pid
 - `status`  Show status for all tasks
+- `dump`    Show current weaver configuration
 - `exit`    Stop all tasks and exit
 
 # Options
@@ -86,12 +88,12 @@ For example to restart web processes you need to say
 
 	weaver restart web
 
-and to stop worker
+and to stop redis monitor
 
-	weaver stop worker
+	weaver stop redis
 
-Processes in the web group get different command line arguments but similar environment. By default tasks have access to PATH, NODE_PATH and HOME
-environment variables.
+Processes in the web group get different command line arguments but similar environment. By default tasks have access to `PATH`, `NODE_PATH` and `HOME`
+environment variables. `NODE_PATH` is set automatically only when `executable` flag is not set.
 
 Bash commands to start processes manually in same way as weaver does in example above
 
@@ -102,7 +104,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 
 # Configuration file structure
 
-- `path`       Path to working directory, relative to configuration file or absolute
+- `path`       Path to working directory, relative to configuration file or absolute. Optional
 - `tasks`      Task groups
 - `count`      Task count for group
 - `source`     Source file for task group
