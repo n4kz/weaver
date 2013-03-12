@@ -120,7 +120,7 @@ vows
 			topic: false
 			simple:
 				topic: ->
-					task = new Task 'stop simple'
+					task = new Task 'stop simple',
 						count: 2
 						source: sigint
 						timeout: 50
@@ -152,7 +152,7 @@ vows
 
 			full:
 				topic: ->
-					task = new Task 'stop full'
+					task = new Task 'stop full',
 						count: 2
 						source: plain
 						timeout: 100
