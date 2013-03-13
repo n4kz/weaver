@@ -303,6 +303,7 @@ report.status = function (result) {
 	var tasks   = result.tasks,
 		lname   = 0,
 		lsource = 0,
+		now     = Date.now(),
 		name, task, subtasks, i, l, pid, status, color;
 
 	for (name in tasks) {
@@ -353,6 +354,7 @@ report.status = function (result) {
 				sprintf('%5u', subtasks[i].pid) +
 				clear +
 				(color? '' : ' ' + status) +
+				sprintf(' %3s', elapsed(subtasks[i].time, now)) +
 				sprintf(' %-' + lname + 's %-' + lsource + 's %s', name, task.source, subtasks[i].args.join(' '))
 			);
 		}
@@ -364,5 +366,20 @@ report.dump = function (result) {
 
 	console.log(inspect(result.config, false, null, !argv.nocolor));
 };
+
+function elapsed (from, to) {
+	var delta = (to - from) / 1000;
+
+	if (delta < 60)         return time(delta, 's');
+	if ((delta /= 60) < 60) return time(delta, 'm');
+	if ((delta /= 60) < 24) return time(delta, 'h');
+	if ((delta /= 24) < 7)  return time(delta, 'd');
+
+	return time(delta / 7, 'w');
+}
+
+function time (value, units) {
+	return (value << 0 || 1) + units;
+}
 
 /* vim: set ft=javascript : */
