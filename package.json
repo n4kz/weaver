@@ -2,12 +2,11 @@
 	"name": "weaver",
 	"version": "0.0.7",
 	"description": "Interactive process management system",
-	"keywords": ["daemon", "process", "udp", "log"],
+	"keywords": ["daemon", "process", "udp", "log", "sysadmin", "tools"],
 	"main": "lib/weaver.js",
 	"license": "LGPLv3",
 	"preferGlobal": true,
 	"author": "Alexander Nazarov <n4kz@n4kz.com>",
-	"maintainers": "Alexander Nazarov <n4kz@n4kz.com>",
 	"bin": {
 		"weaver": "bin/weaver"
 	},
@@ -18,7 +17,6 @@
 	"dependencies": {
 		"glob": "*",
 		"sprintf": "*",
-		"daemon": "*",
 		"optimist": "*"
 	},
 	"devDependencies": {

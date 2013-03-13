@@ -6,10 +6,11 @@ var red      = '\033[01;31m',
 
 'use strict';
 
-var Weaver, daemon, command, server,
+var command,
 	ok       = true,
 	net      = require('net'),
 	resolve  = require('path').resolve,
+	dirname  = require('path').dirname,
 	optimist = require('optimist'),
 	report   = {},
 	sprintf  = require('sprintf').sprintf,
@@ -67,6 +68,7 @@ if (argv.help) {
 	ok = false;
 }
 
+/* Show version */
 if (argv.version) {
 	console.log(require('../package').version);
 	process.exit();
@@ -113,48 +115,30 @@ if (!ok) {
 }
 
 if (argv.daemon) {
-	var udp = require('dgram').createSocket('udp4'),
-		log = console.log;
+	var path = dirname(process.argv[1]),
+		child = require('child_process').spawn(path + '/daemon', [JSON.stringify({
+				config: argv.config? resolve(argv.config) : null,
+				port: argv.port,
+				debug: argv.debug
+			})], {
+			detached: !argv.debug,
+			stdio: argv.debug? 'inherit' : ['ignore', 'ignore', 'pipe'],
+			env: process.env
+		}), code = 0;
 
-	/* Send stdout and stderr to udp */
 	if (!argv.debug) {
-		log = function (data) {
-			data = new Buffer(data + '\n');
-			udp.send(data, 0, data.length, argv.port, 'localhost');
-		};
+		child.stderr.on('data', function (data) {
+			code = 1;
+			process.stderr.write(data.toString());
+		});
+
+		setTimeout(function () {
+			/* Wait 150ms for possible errors and exit */
+			process.exit(code);
+		}, 150);
+
+		child.unref();
 	}
-
-	Weaver = new require('../lib/weaver')(argv.config? resolve(argv.config) : undefined);
-
-	/* Start daemon */
-	if (!argv.debug) {
-		require('daemon').start();
-	}
-
-	process.chdir('/');
-	process.title = 'weaver [' + argv.port + ']';
-
-	Weaver.log = function (message) {
-		if (this === Weaver) {
-			message = process.pid + ' (weaver) ' + message;
-		} else {
-			message = message.slice(0, message.length - 1);
-		}
-
-		log(message);
-	};
-
-	/* Signal handlers */
-	process
-		.on('SIGINT',  Weaver.die)
-		.on('SIGTERM', Weaver.die)
-		.on('SIGKILL', Weaver.die)
-		.on('SIGHUP',  Weaver.config);
-
-	/* Setup control interface */
-	net.createServer()
-		.listen(argv.port, 'localhost')
-		.on('connection', accept);
 } else {
 	var response = '',
 		data     = command,
@@ -218,85 +202,6 @@ if (argv.daemon) {
 				break;
 		}
 	});
-}
-
-function accept (socket) {
-	socket.once('data', execute);
-}
-
-function execute (data) {
-	var parameters = data.toString().replace(/[\r\n]+$/, '').split('\r\n', 2),
-		command    = parameters[0],
-		tasks      = Weaver.tasks,
-		result     = {
-			status : 'ok',
-			pid    : process.pid,
-			memory : process.memoryUsage().rss >> 10
-		},
-		name, i, l, pid, args = [];
-
-	try {
-		parameters = JSON.parse(parameters[1] || '[]');
-	} catch (error) {
-		result.status = 'error';
-		result.message = error.message;
-		error.message = 'Client error: ' + error.message;
-
-		Weaver.emit('error', error);
-		this.end(JSON.stringify(result) + '\r\n');
-		return;
-	}
-
-	switch (command) {
-		case 'kill':
-		case 'stop':
-		case 'restart':
-			/* Push signal name to args */
-			if (command === 'kill') {
-				args.push(parameters.shift());
-			}
-
-			/* name/pid */
-			for (i = 0, l = parameters.length; i < l; i++) {
-				name = String(parameters[i]);
-
-				Weaver[command].call(null, name, args);
-			}
-
-			/* all */
-			if (!parameters.length) {
-				Weaver[command].call(null, null, args);
-			}
-
-			Weaver.check();
-			break;
-
-		case 'exit':
-			Weaver.die(0);
-			break;
-
-		case 'upgrade':
-			if (parameters[0]) {
-				Weaver.file = parameters[0];
-			}
-
-			Weaver.config();
-			break;
-
-		case 'dump':
-			result.config = Weaver.parameters;
-			break;
-
-		case 'status':
-			result.tasks = Weaver.status();
-			break;
-
-		default:
-			result.status  = 'error';
-			result.message = 'Unknown command';
-	}
-
-	this.end(JSON.stringify(result) + '\r\n');
 }
 
 report.status = function (result) {
