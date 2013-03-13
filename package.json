@@ -1,20 +1,19 @@
 {
 	"name": "weaver",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"description": "Interactive process management system",
+	"keywords": ["daemon", "process", "udp", "log"],
 	"main": "lib/weaver.js",
 	"license": "LGPLv3",
 	"preferGlobal": true,
-	"author": {
-		"name": "Alexander Nazarov",
-		"email": "n4kz@n4kz.com"
-	},
+	"author": "Alexander Nazarov <n4kz@n4kz.com>",
+	"maintainers": "Alexander Nazarov <n4kz@n4kz.com>",
 	"bin": {
 		"weaver": "bin/weaver"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/n4kz/anubseran.git"
+		"url": "git://github.com/n4kz/weaver.git"
 	},
 	"dependencies": {
 		"glob": "*",
@@ -28,5 +27,8 @@
 	},
 	"engines": {
 		"node": ">=0.6.0"
+	},
+	"scripts": {
+		"test": "make"
 	}
 }
