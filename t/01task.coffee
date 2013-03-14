@@ -1,12 +1,9 @@
 assert = require 'assert'
-http   = require 'http'
-vows   = require 'vows'
 Task   = require '../lib/task.js'
 sigint = './t/bin/sigint'
 plain  = './t/bin/plain'
 
-
-vows
+(vows = require 'vows')
 	.describe('task')
 	.addBatch
 		constructor:
@@ -65,7 +62,7 @@ vows
 
 					setTimeout((=>
 						@callback()
-					), 100)
+					), 1000)
 
 					undefined
 
@@ -94,16 +91,17 @@ vows
 					setTimeout((->
 						task.upgrade
 							arguments: [1000]
-					), 50)
+					), 100)
 
 					setTimeout((=>
 						@callback()
-					), 350)
+					), 1000)
 
 					undefined
 
 				method: ->
 					task = new Task 'upgrade full'
+
 					assert task.subtasks.length is 2,            'two tasks'
 					assert task.subtasks[0].pid,                 'first has pid'
 					assert task.subtasks[0].pid isnt task._pid1, 'first pid isnt old pid 1'
@@ -116,11 +114,81 @@ vows
 					assert task.subtasks[0].id is 0,             'first has right id'
 					assert task.subtasks[1].id is 1,             'second has right id'
 
+		restart:
+			topic: false
+			one:
+				topic: ->
+					task = new Task 'restart one',
+						count: 2
+						source: sigint
+						timeout: 50
+
+					task._pid1 = task.subtasks[0].pid
+					task._pid2 = task.subtasks[1].pid
+
+					setTimeout((->
+						console.warn('restart')
+						task.restart(task._pid1)
+					), 300)
+
+					setTimeout((=>
+						@callback()
+					), 1000)
+
+					undefined
+
+				method: ->
+					task = new Task 'restart one'
+
+					assert task.subtasks.length is 2,            'two tasks'
+					assert task.subtasks[0].pid,                 'first has pid'
+					assert task.subtasks[1].pid,                 'second has pid'
+					assert task.subtasks[0].pid isnt task._pid1, 'first pid isnt old pid 1'
+					assert task.subtasks[0].pid isnt task._pid2, 'first pid isnt old pid 2'
+					assert task.subtasks[1].pid isnt task._pid1, 'second pid isnt old pid 1'
+					assert task.subtasks[1].pid is   task._pid2, 'second pid is old pid 2'
+					assert task.subtasks[0].status is 'W',       'first has right status'
+					assert task.subtasks[1].status is 'W',       'second has right status'
+					assert task.subtasks[0].id is 0,             'first has right id'
+					assert task.subtasks[1].id is 1,             'second has right id'
+
+			all:
+				topic: ->
+					task = new Task 'restart all',
+						count: 2
+						source: plain
+						timeout: 100
+
+					setTimeout((->
+						task.restart()
+					), 200)
+
+					setTimeout((=>
+						@callback()
+					), 1000)
+
+					undefined
+
+				method: ->
+					task = new Task 'restart all'
+
+					assert task.subtasks.length is 2,            'two tasks'
+					assert task.subtasks[0].pid,                 'first has pid'
+					assert task.subtasks[1].pid,                 'second has pid'
+					assert task.subtasks[0].pid isnt task._pid1, 'first pid isnt old pid 1'
+					assert task.subtasks[0].pid isnt task._pid2, 'first pid isnt old pid 2'
+					assert task.subtasks[1].pid isnt task._pid1, 'second pid isnt old pid 1'
+					assert task.subtasks[1].pid isnt task._pid2, 'second pid isnt old pid 2'
+					assert task.subtasks[0].id is 0,             'first has right id'
+					assert task.subtasks[1].id is 1,             'second has right id'
+					assert.equal task.subtasks[0].status, 'W',   'first has right status'
+					assert.equal task.subtasks[1].status, 'W',   'second has right status'
+
 		stop:
 			topic: false
-			simple:
+			one:
 				topic: ->
-					task = new Task 'stop simple',
+					task = new Task 'stop one',
 						count: 2
 						source: sigint
 						timeout: 50
@@ -134,12 +202,13 @@ vows
 
 					setTimeout((=>
 						@callback()
-					), 150)
+					), 1000)
 
 					undefined
 
 				method: ->
-					task = new Task 'stop simple'
+					task = new Task 'stop one'
+
 					assert task.subtasks.length is 2,            'two tasks'
 					assert not task.subtasks[0].pid,             'first has no pid'
 					assert task.subtasks[1].pid,                 'second has pid'
@@ -150,9 +219,9 @@ vows
 					assert task.subtasks[0].id is 0,             'first has right id'
 					assert task.subtasks[1].id is 1,             'second has right id'
 
-			full:
+			all:
 				topic: ->
-					task = new Task 'stop full',
+					task = new Task 'stop all',
 						count: 2
 						source: plain
 						timeout: 100
@@ -163,12 +232,13 @@ vows
 
 					setTimeout((=>
 						@callback()
-					), 300)
+					), 1000)
 
 					undefined
 
 				method: ->
-					task = new Task 'stop full'
+					task = new Task 'stop all'
+
 					assert task.subtasks.length is 2,            'two tasks'
 					assert not task.subtasks[0].pid,             'first has no pid'
 					assert not task.subtasks[1].pid,             'second has no pid'
