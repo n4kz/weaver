@@ -38,7 +38,6 @@ _ = (name, fn) ->
 				assert.notEqual task.subtasks[0].pid, 0
 				assert.notEqual task.subtasks[0].pid, task._pid1
 				assert.notEqual task.subtasks[0].pid, task._pid2
-				assert.notEqual task.subtasks[1].pid, task._pid1
 				assert.equal    task.subtasks[1].pid, task._pid2
 
 			status: _ 31, (task) ->

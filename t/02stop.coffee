@@ -34,10 +34,8 @@ _ = (name, fn) ->
 				assert.equal task.subtasks.length, 2
 
 			processes: _ 21, (task) ->
-				assert.notEqual task.subtasks[1].pid, 0
-				assert.equal    task.subtasks[0].pid, 0
-				assert.notEqual task.subtasks[1].pid, task._pid1
-				assert.equal    task.subtasks[1].pid, task._pid2
+				assert.equal task.subtasks[0].pid, 0
+				assert.equal task.subtasks[1].pid, task._pid2
 
 			status: _ 21, (task) ->
 				assert.equal task.subtasks[0].status, 'E'
@@ -68,8 +66,8 @@ _ = (name, fn) ->
 				assert.equal task.subtasks.length, 2
 
 			processes: _ 22, (task) ->
-				assert.equal    task.subtasks[1].pid, 0
-				assert.equal    task.subtasks[0].pid, 0
+				assert.equal task.subtasks[1].pid, 0
+				assert.equal task.subtasks[0].pid, 0
 
 			status: _ 22, (task) ->
 				assert.equal task.subtasks[0].status, 'E'
