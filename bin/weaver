@@ -194,7 +194,7 @@ if (argv.daemon) {
 			case 'status':
 				console.log(
 					green + sprintf('%5u', response.pid) + clear +
-					' weaver (' + yellow + response.memory + 'K' + clear + ')'
+					' weaver ' + response.version + ' (' + yellow + response.memory + 'K' + clear + ')'
 				);
 
 			case 'dump':

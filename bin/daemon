@@ -47,9 +47,10 @@ function execute (data) {
 	var parameters = data.toString().replace(/[\r\n]+$/, '').split('\r\n', 2),
 		command    = parameters[0],
 		result     = {
-			status : 'ok',
-			pid    : process.pid,
-			memory : process.memoryUsage().rss >> 10
+			version : Weaver.version,
+			status  : 'ok',
+			pid     : process.pid,
+			memory  : process.memoryUsage().rss >> 10
 		},
 		i, l, args = [];
 
