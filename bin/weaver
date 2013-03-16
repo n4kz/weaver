@@ -115,8 +115,8 @@ if (!ok) {
 }
 
 if (argv.daemon) {
-	var path = dirname(process.argv[1]),
-		child = require('child_process').spawn(path + '/daemon', [JSON.stringify({
+	var code  = 0,
+		child = require('child_process').spawn(require('weaver/lib/daemon'), [JSON.stringify({
 				config: argv.config? resolve(argv.config) : null,
 				port: argv.port,
 				debug: argv.debug
@@ -124,7 +124,7 @@ if (argv.daemon) {
 			detached: !argv.debug,
 			stdio: argv.debug? 'inherit' : ['ignore', 'ignore', 'pipe'],
 			env: process.env
-		}), code = 0;
+		});
 
 	if (!argv.debug) {
 		child.stderr.on('data', function (data) {
