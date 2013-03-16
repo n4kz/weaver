@@ -1,6 +1,6 @@
 {
 	"name": "weaver",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"description": "Interactive process management system",
 	"keywords": ["daemon", "process", "udp", "log", "sysadmin", "tools"],
 	"main": "lib/weaver.js",
