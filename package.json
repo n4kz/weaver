@@ -1,6 +1,6 @@
 {
 	"name": "weaver",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"description": "Interactive process management system",
 	"keywords": ["daemon", "process", "udp", "log", "sysadmin", "tools"],
 	"main": "lib/weaver.js",
@@ -20,7 +20,7 @@
 		"optimist": "*"
 	},
 	"devDependencies": {
-		"coffee-script": "*",
+		"coffee-script": ">=1.6.0",
 		"vows": "*"
 	},
 	"engines": {
