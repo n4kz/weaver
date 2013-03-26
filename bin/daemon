@@ -33,7 +33,6 @@ Weaver.log = function (message) {
 process
 	.on('SIGINT',  Weaver.die)
 	.on('SIGTERM', Weaver.die)
-	.on('SIGKILL', Weaver.die)
 	.on('SIGHUP',  Weaver.config);
 
 /* Setup control interface */
