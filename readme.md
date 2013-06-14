@@ -45,6 +45,9 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 	--version  Show version                                                        [boolean]
 	--port     Use specified port                                                  [default: 8092]
 
+Also `WEAVER_PORT` and `WEAVER_DEBUG` environment variables can be used to set options, but
+command line options have higher priority.
+
 # Configuration example
 
 	{

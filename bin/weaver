@@ -15,8 +15,9 @@ var command,
 	report   = {},
 	sprintf  = require('sprintf').sprintf,
 	argv     = optimist
-		.default('port', 8092)
 		.boolean(['help', 'debug', 'nocolor', 'version'])
+		.default('port', process.env.WEAVER_PORT || 8092)
+		.default('debug', !!process.env.WEAVER_DEBUG)
 		.usage([
 			'Usage:',
 			'    weaver [--port <number>] [--config <path>] [--debug] [start]',
