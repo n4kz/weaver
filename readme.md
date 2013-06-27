@@ -5,11 +5,11 @@ Interactive process management system for node.js
 # Installation
 
 ```bash
-    # Global
-    npm -g install weaver
-    
-    # Local
-    npm install weaver
+# Global
+npm -g install weaver
+
+# Local
+npm install weaver
 ```
 
 If you have chosen local installation, check your `PATH` environment variable. `npm` creates symlinks to
@@ -17,13 +17,13 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 
 # Usage
 
-    weaver [--port <number>] [--config <path>] [--debug] [start]
-    weaver [--port <number>] [--config <path>] upgrade
-    weaver [--port <number>] <restart|stop> [[task|pid], ...]
-    weaver [--port <number>] kill <signal> [[task|pid], ...]
-    weaver [--port <number>] [--nocolor] status
-    weaver [--port <number>] [--nocolor] dump
-    weaver [--port <number>] exit
+	weaver [--port <number>] [--config <path>] [--debug] [start]
+	weaver [--port <number>] [--config <path>] upgrade
+	weaver [--port <number>] <restart|stop> [[task|pid], ...]
+	weaver [--port <number>] kill <signal> [[task|pid], ...]
+	weaver [--port <number>] [--nocolor] status
+	weaver [--port <number>] [--nocolor] dump
+	weaver [--port <number>] exit
 
 # Commands
 
@@ -50,40 +50,42 @@ command line options have higher priority.
 
 # Configuration example
 
-	{
-		"path": "..",
-		"tasks": {
-			"web": {
-				"count": 2,
-				"source": "lib/main.js",
-				"persistent": false,
-				"arguments": ["--web", "--port", [8001, 8002]],
-				"watch": ["lib/**/*.js", "config/default.js", "config/local.json"],
-				"env": {
-					"NODE_ENV": "local"
-				}
-			},
-
-			"worker": {
-				"count": 1,
-				"timeout": 2000,
-				"source": "lib/main.js",
-				"persistent": false,
-				"arguments": ["--worker"],
-				"watch": ["lib/worker/*.js"],
-				"env": {
-					"NODE_ENV": "local"
-				}
-			},
-
-			"redis": {
-				"count": 1,
-				"source": "redis-cli",
-				"executable": true,
-				"arguments": ["monitor"]
+```json
+{
+	"path": "..",
+	"tasks": {
+		"web": {
+			"count": 2,
+			"source": "lib/main.js",
+			"persistent": false,
+			"arguments": ["--web", "--port", [8001, 8002]],
+			"watch": ["lib/**/*.js", "config/default.js", "config/local.json"],
+			"env": {
+				"NODE_ENV": "local"
 			}
+		},
+
+		"worker": {
+			"count": 1,
+			"timeout": 2000,
+			"source": "lib/main.js",
+			"persistent": false,
+			"arguments": ["--worker"],
+			"watch": ["lib/worker/*.js"],
+			"env": {
+				"NODE_ENV": "local"
+			}
+		},
+
+		"redis": {
+			"count": 1,
+			"source": "redis-cli",
+			"executable": true,
+			"arguments": ["monitor"]
 		}
 	}
+}
+```
 
 With such config file weaver will run three processes and restart them when one of watched files is modified. Fourth process will
 send commands from redis in monitor mode to log. Processes are organized in three groups and can be managed by group name.
@@ -125,8 +127,7 @@ Weaver will collect logs for you and send anything from subtasks stdout and stde
 In debug mode this functionality is disabled and logs are printed to stdout.
 To do something with this logs you can simply say
 
-    socat udp4-listen:8092 stdout
-
+	socat udp4-listen:8092 stdout
 
 # Copyright and License
 
