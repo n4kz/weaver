@@ -120,6 +120,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 - `watch`      Restart all tasks in task group when one of watched files was modified. Optional
 - `timeout`    Timeout between SIGINT and SIGTERM for stop and restart commands. Defaults to 1000ms. Optional
 - `cwd`        Task group working directory. Defaults to path. Optional
+- `runtime`    Minimal runtime required for persistent task to be restarted after unclean exit
 
 # Logs
 
