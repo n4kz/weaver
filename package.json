@@ -1,10 +1,10 @@
 {
 	"name": "weaver",
-	"version": "0.0.10",
+	"version": "0.0.11",
 	"description": "Interactive process management system",
 	"keywords": ["daemon", "process", "udp", "log", "sysadmin", "tools"],
 	"main": "lib/weaver.js",
-	"license": "LGPLv3",
+	"license": "LGPL-3.0",
 	"preferGlobal": true,
 	"author": "Alexander Nazarov <n4kz@n4kz.com>",
 	"bin": {
