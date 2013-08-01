@@ -11,6 +11,7 @@ var command,
 	net      = require('net'),
 	resolve  = require('path').resolve,
 	dirname  = require('path').dirname,
+	exists   = require('fs').existsSync,
 	optimist = require('optimist'),
 	report   = {},
 	sprintf  = require('sprintf').sprintf,
@@ -116,6 +117,10 @@ if (!ok) {
 }
 
 if (argv.daemon) {
+	if (!argv.config && exists('weaver.json')) {
+		argv.config = 'weaver.json';
+	}
+
 	var code  = 0,
 		child = require('child_process').spawn(require('weaver/lib/daemon'), [JSON.stringify({
 				config: argv.config? resolve(argv.config) : null,
