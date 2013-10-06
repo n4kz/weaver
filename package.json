@@ -21,7 +21,8 @@
 	},
 	"devDependencies": {
 		"coffee-script": ">=1.6.0",
-		"vows": "*"
+		"vows": "*",
+		"jslint": "*"
 	},
 	"engines": {
 		"node": ">=0.6.0"

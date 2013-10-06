@@ -4,5 +4,8 @@ test: compile
 compile:
 	coffee --compile t/*.coffee
 
+lint:
+	jslint lib/*
+
 clean:
 	rm t/*.js

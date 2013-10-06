@@ -4,7 +4,8 @@
 var udp    = require('dgram').createSocket('udp4'),
 	net    = require('net'),
 	log    = console.log,
-	params = JSON.parse(process.argv[2]);
+	params = JSON.parse(process.argv[2]),
+	Weaver = require('../lib/weaver');
 
 if (!params.debug) {
 	/* Send stdout and stderr to udp */
@@ -14,26 +15,32 @@ if (!params.debug) {
 	};
 }
 
-var Weaver = new require('../lib/weaver')(params.config || undefined);
-
-process.chdir('/');
-process.title = 'weaver [' + params.port + ']';
-
 Weaver.log = function (message) {
 	if (this === Weaver) {
 		message = process.pid + ' (weaver) ' + message;
 	} else {
-		message = message.slice(0, message.length - 1);
+		message = message.slice(0);
 	}
 
 	log(message);
+
+	return Weaver;
 };
+
+/* Read config file */
+if (params.config) {
+	Weaver.file = params.config;
+	Weaver.emit('config');
+}
+
+process.chdir('/');
+process.title = 'weaver [' + params.port + ']';
 
 /* Signal handlers */
 process
-	.on('SIGINT',  Weaver.die)
-	.on('SIGTERM', Weaver.die)
-	.on('SIGHUP',  Weaver.config);
+	.on('SIGINT',  function () { Weaver.die(2) })
+	.on('SIGTERM', function () { Weaver.die(15) })
+	.on('SIGHUP',  function () { Weaver.emit('config') });
 
 /* Setup control interface */
 net.createServer()
@@ -77,14 +84,14 @@ function execute (data) {
 			if (l = parameters.length) {
 				/* by name/pid */
 				for (i = 0; i < l; i++) {
-					Weaver[command].call(null, String(parameters[i]), args);
+					Weaver.command(command, String(parameters[i]), args);
 				}
 			} else {
 				/* all */
-				Weaver[command].call(null, null, args);
+				Weaver.command(command, null, args);
 			}
 
-			Weaver.check();
+			Weaver.emit('upgrade');
 			break;
 
 		case 'exit':
