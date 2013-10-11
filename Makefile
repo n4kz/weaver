@@ -5,7 +5,7 @@ compile:
 	coffee --compile t/*.coffee
 
 lint:
-	jslint lib/*
+	jslint --white --node --plusplus --bitwise --nomen lib/*
 
 clean:
 	rm t/*.js
