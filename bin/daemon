@@ -54,6 +54,7 @@ function execute (data) {
 		command    = parameters[0],
 		result     = {
 			version : Weaver.version,
+			uptime  : Date.now() - Weaver.start,
 			status  : 'ok',
 			pid     : process.pid,
 			memory  : process.memoryUsage().rss >> 10

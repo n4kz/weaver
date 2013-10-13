@@ -200,6 +200,8 @@ if (argv.daemon) {
 			case 'status':
 				console.log(
 					green + sprintf('%5u', response.pid) + clear +
+					(argv.nocolor? '  ' : '') +
+					sprintf(' %3s', elapsed(response.uptime)) +
 					' weaver ' + response.version + ' (' + yellow + response.memory + 'K' + clear + ')'
 				);
 
@@ -265,7 +267,7 @@ report.status = function (result) {
 				sprintf('%5u', subtasks[i].pid) +
 				clear +
 				(color? '' : ' ' + status) +
-				sprintf(' %3s', elapsed(subtasks[i].time, now)) +
+				sprintf(' %3s', elapsed(subtasks[i].uptime)) +
 				sprintf(' %-' + lname + 's %-' + lsource + 's %s', name, task.source, subtasks[i].args.join(' '))
 			);
 		}
@@ -278,8 +280,8 @@ report.dump = function (result) {
 	console.log(inspect(result.config, false, null, !argv.nocolor));
 };
 
-function elapsed (from, to) {
-	var delta = (to - from) / 1000;
+function elapsed (delta) {
+	delta /= 1000;
 
 	if (delta < 60)         return time(delta, 's');
 	if ((delta /= 60) < 60) return time(delta, 'm');
