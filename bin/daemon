@@ -104,7 +104,7 @@ function execute (data) {
 				Weaver.file = parameters[0];
 			}
 
-			Weaver.config();
+			Weaver.emit('config');
 			break;
 
 		case 'dump':
