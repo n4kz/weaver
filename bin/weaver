@@ -21,7 +21,7 @@ var command,
 		.default('debug', !!process.env.WEAVER_DEBUG)
 		.usage([
 			'Usage:',
-			'    weaver [--port <number>] [--config <path>] [--debug] [start]',
+			'    weaver [--port <number>] [--config <path>] [--debug]',
 			'    weaver [--port <number>] [--config <path>] upgrade',
 			'    weaver [--port <number>] <restart|stop> [[task|pid], ...]',
 			'    weaver [--port <number>] kill <signal> [[task|pid], ...]',
@@ -30,8 +30,6 @@ var command,
 			'    weaver [--port <number>] exit',
 			'',
 			'Commands:',
-			'    start',
-			'        Start daemon if it was not started before. Default command',
 			'    upgrade',
 			'        Change or re-read config file',
 			'    restart',
@@ -58,9 +56,9 @@ var command,
 		})
 		.argv;
 
-command = argv._[0] || 'start';
+command = argv._[0];
 
-if (command === 'start') {
+if (!command) {
 	argv.daemon  = true;
 	argv.nocolor = true;
 }
