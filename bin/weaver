@@ -164,7 +164,7 @@ if (argv.daemon) {
 		case 'restart':
 			if (command === 'kill') {
 				argv._[1] = argv._[1]
-					.replace(/^(?!sig)/, 'sig')
+					.replace(/^(?!sig)/i, 'sig')
 					.toUpperCase()
 			}
 
