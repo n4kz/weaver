@@ -40,6 +40,16 @@ events = ['error', 'config', 'upgrade']
 			methods: ->
 				for method in methods
 					assert.isFunction weaver[method]
+					assert not weaver.propertyIsEnumerable method
+
+			define: ->
+				noop = ->
+
+				weaver.define 'method', 'noop', noop
+
+				# New method defined
+				assert.equal weaver.noop, noop
+				assert not weaver.propertyIsEnumerable 'noop'
 
 			events: ->
 				for event in events

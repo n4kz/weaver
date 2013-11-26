@@ -1,5 +1,6 @@
 test: compile
-	vows t/*.js
+	vows -i t/*.js
+	@echo
 
 compile:
 	coffee --compile t/*.coffee
