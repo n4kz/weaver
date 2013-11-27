@@ -12,47 +12,44 @@ events = ['error', 'config', 'upgrade']
 (require 'vows')
 	.describe('basic')
 	.addBatch
-		require:
-			topic: null
+		constructor: ->
+			assert.instanceOf weaver, weaver.constructor
+			assert.instanceOf weaver, emitter
 
-			constructor: ->
-				assert.instanceOf weaver, weaver.constructor
-				assert.instanceOf weaver, emitter
+		properties: ->
+			# version
+			assert.equal weaver.version, require('../package').version
 
-			properties: ->
-				# version
-				assert.equal weaver.version, require('../package').version
+			# start
+			assert.isNumber weaver.start
+			assert weaver.start <= Date.now()
+			assert weaver.start > 0
 
-				# start
-				assert.isNumber weaver.start
-				assert weaver.start <= Date.now()
-				assert weaver.start > 0
+			# tasks
+			assert.deepEqual weaver.tasks, {}
 
-				# tasks
-				assert.deepEqual weaver.tasks, {}
+			# parameters
+			assert.deepEqual weaver.parameters, {}
 
-				# parameters
-				assert.deepEqual weaver.parameters, {}
+			# file
+			assert.equal weaver.file, ''
 
-				# file
-				assert.equal weaver.file, ''
+		methods: ->
+			for method in methods
+				assert.isFunction weaver[method]
+				assert not weaver.propertyIsEnumerable method
 
-			methods: ->
-				for method in methods
-					assert.isFunction weaver[method]
-					assert not weaver.propertyIsEnumerable method
+		define: ->
+			noop = ->
 
-			define: ->
-				noop = ->
+			weaver.define 'method', 'noop', noop
 
-				weaver.define 'method', 'noop', noop
+			# New method defined
+			assert.equal weaver.noop, noop
+			assert not weaver.propertyIsEnumerable 'noop'
 
-				# New method defined
-				assert.equal weaver.noop, noop
-				assert not weaver.propertyIsEnumerable 'noop'
-
-			events: ->
-				for event in events
-					assert.equal emitter.listenerCount(weaver, event), 1
+		events: ->
+			for event in events
+				assert.equal emitter.listenerCount(weaver, event), 1
 
 	.export(module)

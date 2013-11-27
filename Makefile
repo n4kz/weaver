@@ -1,5 +1,5 @@
 test: compile
-	vows -i t/*.js
+	vows --spec -i t/*.js
 	@echo
 
 compile:

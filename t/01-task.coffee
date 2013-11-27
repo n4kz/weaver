@@ -2,7 +2,6 @@ assert  = require('assert')
 weaver  = require('../lib/weaver.js')
 emitter = require('events').EventEmitter
 
-name = 'test' + Date.now()
 
 methods = [
 	'upgrade', 'upgradeParameter', 'expandEnv', 'get', 'spawn', 'foreach',
@@ -12,17 +11,17 @@ methods = [
 	'log', 'exitHandler'
 ]
 
-weaver.task(name, {})
-task = weaver.tasks[name]
+defaultName = 'test' + Date.now()
+weaver.task(defaultName, {})
 
 (require 'vows')
 	.describe('task')
 	.addBatch
-		require:
-			topic: null
-
 		# Check default properties
 		properties: ->
+			name = defaultName
+			task = weaver.tasks[name]
+
 			assert.equal name, task.name
 
 			assert.isArray  task.subtasks
@@ -39,8 +38,30 @@ task = weaver.tasks[name]
 			assert.equal process.cwd(), task.cwd
 
 		methods: ->
+			name = defaultName
+			task = weaver.tasks[name]
+
 			for method in methods
-				assert.isFunction task[method]
-				assert not weaver.propertyIsEnumerable task
+			  assert.isFunction task[method]
+			  assert not weaver.propertyIsEnumerable task
+
+		constructor: ->
+			name = Math.random()
+			task = weaver.tasks[name]
+
+			assert.isUndefined task
+
+			task = weaver.task(name)
+
+			assert.equal task.constructor, weaver.task
+			assert.equal task, weaver.tasks[name]
+			assert.equal 1000, task.runtime
+			assert.equal 1000, task.timeout
+
+			assert.equal task, weaver.task(name, runtime: 2000)
+			assert.equal 2000, task.runtime
+			assert.equal task, weaver.task(name, timeout: 5000)
+			assert.equal 5000, task.timeout
+			assert.equal task, weaver.tasks[name]
 
 	.export(module)
