@@ -27,6 +27,7 @@ var command,
 			'    weaver [--port <number>] kill <signal> [[task|pid], ...]',
 			'    weaver [--port <number>] [--nocolor] status',
 			'    weaver [--port <number>] [--nocolor] dump',
+			'    weaver [--port <number>] monitor',
 			'    weaver [--port <number>] exit',
 			'',
 			'Commands:',
@@ -42,6 +43,8 @@ var command,
 			'        Show status for all tasks',
 			'    dump',
 			'        Show current weaver configuration',
+			'    monitor',
+			'        Show log messages from running weaver',
 			'    exit',
 			'        Stop all tasks and exit',
 			''
@@ -85,6 +88,7 @@ if (!argv.daemon) {
 
 		case 'stop':
 		case 'restart':
+		case 'monitor':
 			break;
 
 		case 'upgrade':
@@ -143,6 +147,14 @@ if (argv.daemon) {
 
 		child.unref();
 	}
+} else if (command === 'monitor') {
+	var udp    = require('dgram').createSocket('udp4'),
+		stdout = process.stdout;
+
+	/* Send all UDP messages to STDOUT */
+	udp.on('message', stdout.write.bind(stdout));
+
+	udp.bind(argv.port);
 } else {
 	var response = '',
 		data     = command,
