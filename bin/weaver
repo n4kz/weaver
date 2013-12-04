@@ -88,12 +88,12 @@ if (!argv.daemon) {
 
 		case 'stop':
 		case 'restart':
-		case 'monitor':
 			break;
 
 		case 'upgrade':
 		case 'status':
 		case 'dump':
+		case 'monitor':
 		case 'exit':
 			if (argv._.length !== 1) {
 				ok = false;
