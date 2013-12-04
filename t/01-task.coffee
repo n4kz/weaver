@@ -25,7 +25,7 @@ weaver.task(defaultName, {})
 			assert.equal name, task.name
 
 			assert.isArray  task.subtasks
-			assert.isArray  task.watched
+			assert.isArray  task.watch
 			assert.isArray  task.arguments
 			assert.isObject task.env
 
