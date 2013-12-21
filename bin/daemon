@@ -120,7 +120,8 @@ function execute (data) {
 			result.message = 'Unknown command';
 	}
 
-	this.end(JSON.stringify(result) + '\r\n');
+	/* Do not close socket on exit */
+	this[command === 'exit'? 'write' : 'end'](JSON.stringify(result) + '\r\n');
 }
 
 /* vim: set ft=javascript : */
