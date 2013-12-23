@@ -1,5 +1,5 @@
-assert  = require('assert')
-weaver  = require('../lib/weaver.js')
+assert = require('assert')
+weaver = require('../lib/weaver.js')
 
 (require 'vows')
 	.describe('define')
