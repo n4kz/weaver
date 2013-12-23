@@ -68,7 +68,8 @@ if (!command) {
 
 /* Help requested */
 if (argv.help) {
-	ok = false;
+	optimist.showHelp();
+	process.exit();
 }
 
 /* Show version */
@@ -187,7 +188,7 @@ if (argv.daemon) {
 	socket.once('connect', socket.write.bind(socket, data + '\r\n'));
 
 	socket.on('error', function (error) {
-		console.log('Could not connect to weaver on port ' + argv.port);
+		console.warn('Could not connect to weaver on port ' + argv.port);
 		process.exit(1);
 	});
 
