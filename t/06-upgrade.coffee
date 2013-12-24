@@ -5,7 +5,7 @@ write   = require('fs').writeFileSync
 unlink  = require('fs').unlinkSync
 daemon  = '../bin/weaver'
 port    = 58006
-config  = "#{__dirname}/weaver.json"
+config  = "#{__dirname}/weaver_#{port}.json"
 options =
 	cwd: __dirname
 	env:
@@ -14,13 +14,16 @@ options =
 		WEAVER_PORT: port
 
 (require 'vows')
-	.describe('daemon')
+	.describe('upgrade')
 	.addBatch
 		start:
 			topic: ->
 				# Write empty config
 				write config, JSON.stringify tasks: {}
-				exec daemon, options, @callback
+
+				# Start daemon
+				command = "#{daemon} --config #{config}"
+				exec command, options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert not error

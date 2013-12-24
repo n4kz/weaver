@@ -43,7 +43,7 @@ options =
 				exec command, options, @callback
 				return
 
-			code:   (error, stdout, stderr) -> assert error.code
+			code:   (error, stdout, stderr) -> assert error?.code
 			stdout: (error, stdout, stderr) -> assert not stdout
 			stderr: (error, stdout, stderr) ->
 				assert.include stderr, 'Could not connect'
@@ -87,7 +87,7 @@ options =
 						exec command, options, @callback
 						return
 
-					code:   (error, stdout, stderr) -> assert error.code
+					code:   (error, stdout, stderr) -> assert error?.code
 					stdout: (error, stdout, stderr) -> assert not stdout
 					stderr: (error, stdout, stderr) ->
 						assert.include stderr, 'Could not connect'
