@@ -2,7 +2,7 @@ assert  = require('assert')
 weaver  = require('../lib/weaver.js')
 exec    = require('child_process').exec
 daemon  = '../bin/weaver'
-port    = 58092
+port    = 58004
 options =
 	cwd: __dirname
 	env:

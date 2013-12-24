@@ -3,7 +3,7 @@ weaver  = require('../lib/weaver.js')
 exec    = require('child_process').exec
 spawn   = require('child_process').spawn
 daemon  = '../bin/weaver'
-port    = 58093
+port    = 58005
 options =
 	cwd: __dirname
 	env:
