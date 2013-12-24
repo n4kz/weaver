@@ -49,6 +49,8 @@ net.createServer()
 		socket.once('data', execute);
 	});
 
+Weaver.log('Started');
+
 function execute (data) {
 	var parameters = data.toString().replace(/[\r\n]+$/, '').split('\r\n', 2),
 		command    = parameters[0],
