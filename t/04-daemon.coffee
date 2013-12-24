@@ -68,7 +68,7 @@ options =
 				stderr:  (error, stdout, stderr) -> assert not stderr
 				version: (error, stdout, stderr) -> assert.include stdout, weaver.version
 				name:    (error, stdout, stderr) -> assert.include stdout, 'weaver'
-				pid:     (error, stdout, stderr) -> assert.match stdout, /^\d+\s/
+				pid:     (error, stdout, stderr) -> assert.match stdout, /^\s*\d+\s/
 				memory:  (error, stdout, stderr) -> assert.match stdout, /\s\(\d+K\)/
 
 			stop:
