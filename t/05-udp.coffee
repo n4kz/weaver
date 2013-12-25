@@ -29,7 +29,7 @@ monitor.stdout.on 'data', (data) -> log = String(data)
 			stderr: (error, stdout, stderr) -> assert not stderr
 			log:    (error, stdout, stderr) -> assert.match log, /started/i
 
-			stop:
+			exit:
 				topic: ->
 					command = "#{daemon} exit"
 					exec command, options, (args...) =>

@@ -71,7 +71,7 @@ options =
 				pid:     (error, stdout, stderr) -> assert.match stdout, /^\s*\d+\s/
 				memory:  (error, stdout, stderr) -> assert.match stdout, /\s\(\d+K\)/
 
-			stop:
+			exit:
 				topic: ->
 					command = "#{daemon} exit"
 					exec command, options, @callback

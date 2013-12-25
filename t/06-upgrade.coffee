@@ -113,7 +113,7 @@ options =
 								assert.notEqual pid2, pid3
 								assert.equal    pid3, 0
 
-							stop:
+							exit:
 								topic: ->
 									# Remove config file
 									unlink(config)
