@@ -4,7 +4,7 @@ exec    = require('child_process').exec
 write   = require('fs').writeFileSync
 unlink  = require('fs').unlinkSync
 daemon  = '../bin/weaver'
-port    = 58008
+port    = 58009
 config  = "#{__dirname}/weaver_#{port}.json"
 options =
 	cwd: __dirname
@@ -16,7 +16,7 @@ options =
 status = []
 
 (require 'vows')
-	.describe('stop')
+	.describe('kill')
 	.addBatch
 		start:
 			topic: ->
@@ -59,12 +59,12 @@ status = []
 				stderr: (error, stdout, stderr) -> assert not stderr
 				stdout: (error, stdout, stderr) -> assert.equal stdout.length, 7
 
-				stop:
+				kill:
 					topic: (pid) ->
-						# Stop one task from first group by pid
-						exec "#{daemon} stop #{pid[3]}", options, =>
-							# Stop second group
-							exec "#{daemon} stop s2", options, =>
+						# Kill one task from first group by pid
+						exec "#{daemon} kill SIGINT #{pid[2]}", options, =>
+							# Kill second group
+							exec "#{daemon} kill SIGTERM s2", options, =>
 								# Check status
 								exec "#{daemon} status --nocolor", options, (args...) =>
 									@callback(args..., pid)
@@ -82,8 +82,8 @@ status = []
 						assert.equal stdout.split(' 0 S ').length, 4
 
 						assert.equal pid[1], status[1]
-						assert.equal pid[2], status[2]
-						assert.equal      0, status[3]
+						assert.equal      0, status[2]
+						assert.equal pid[3], status[3]
 						assert.equal pid[4], status[4]
 						assert.equal      0, status[5]
 						assert.equal      0, status[6]
