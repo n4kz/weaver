@@ -60,7 +60,6 @@ status = []
 				watch:
 					topic: (pid) ->
 						# Rewrite config
-						# TODO: second restart
 						write config, configData
 						exec "#{daemon} status --nocolor", options, (args...) => @callback(args..., pid)
 						return
@@ -99,7 +98,6 @@ status = []
 						watch:
 							topic: (pid) ->
 								# Rewrite config
-								# TODO: second restart
 								write config, configData
 								exec "#{daemon} status --nocolor", options, (args...) => @callback(args..., pid)
 								return

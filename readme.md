@@ -1,6 +1,6 @@
 # Weaver
 
-Interactive process management system for node.js 
+Interactive process management system for node.js
 
 # Installation
 
@@ -17,12 +17,13 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 
 # Usage
 
-	weaver [--port <number>] [--config <path>] [--debug] [start]
+	weaver [--port <number>] [--config <path>] [--debug]
 	weaver [--port <number>] [--config <path>] upgrade
 	weaver [--port <number>] <restart|stop> [[task|pid], ...]
 	weaver [--port <number>] kill <signal> [[task|pid], ...]
 	weaver [--port <number>] [--nocolor] status
 	weaver [--port <number>] [--nocolor] dump
+	weaver [--port <number>] monitor
 	weaver [--port <number>] exit
 
 # Commands
@@ -34,6 +35,7 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 - `kill`    Send signal to task group or task by pid
 - `status`  Show status for all tasks
 - `dump`    Show current weaver configuration
+- `monitor` Show log messages from running weaver
 - `exit`    Stop all tasks and exit
 
 # Options
@@ -126,13 +128,17 @@ Bash commands to start processes manually in same way as weaver does in example 
 
 Weaver will collect logs for you and send anything from subtasks stdout and stderr to udp4:localhost:8092 (or any other port of your choice).
 In debug mode this functionality is disabled and logs are printed to stdout.
-To do something with this logs you can simply say
+To do something with this logs you can use monitor mode
+
+	weaver monitor
+
+Or any other program capable to capture udp
 
 	socat udp4-listen:8092 stdout
 
 # Copyright and License
 
-Copyright 2012, 2013 Alexander Nazarov. All rights reserved.
+Copyright 2012-2014 Alexander Nazarov. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
