@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0
+
+Released 2014-01-29
+
+* Monitor mode
+* Messages on start and exit
+* Uptime in status
+* Use `weaver.json` from start directory if available
+* Code cleanup and many minor fixes
+
 ## 0.0.11
 
 Released 2013-06-27
