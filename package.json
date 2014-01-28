@@ -1,8 +1,8 @@
 {
 	"name": "weaver",
-	"version": "0.0.11",
+	"version": "0.1.0",
 	"description": "Interactive process management system",
-	"keywords": ["daemon", "process", "udp", "log", "sysadmin", "tools"],
+	"keywords": ["daemon", "process", "udp", "log", "tools"],
 	"main": "lib/weaver.js",
 	"license": "LGPL-3.0",
 	"preferGlobal": true,
@@ -21,8 +21,7 @@
 	},
 	"devDependencies": {
 		"coffee-script": ">=1.6.0",
-		"vows": "*",
-		"jslint": "*"
+		"vows": "*"
 	},
 	"engines": {
 		"node": ">=0.6.0"
