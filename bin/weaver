@@ -154,7 +154,9 @@ if (argv.daemon) {
 		stdout = process.stdout;
 
 	/* Send all UDP messages to STDOUT */
-	udp.on('message', stdout.write.bind(stdout));
+	udp.on('message', function (data) {
+		stdout.write(String(data));
+	});
 
 	udp.bind(argv.port);
 } else {
