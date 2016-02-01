@@ -1,2 +1,6 @@
-*.swp
+node_modules
+.DS_Store
+*.log
+*.err
+*.sw[po]
 t/*.js
