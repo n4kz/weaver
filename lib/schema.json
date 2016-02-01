@@ -1,0 +1,79 @@
+{
+	"type": "object",
+
+	"properties": {
+		"path"  : { "type" : "string", "minLength": 1, "maxLength": 4096 },
+		"tasks" : {
+			"type": "object",
+
+			"patternProperties": {
+				"^[A-Za-z0-9_]+$": {
+					"type": "object",
+
+					"properties": {
+						"source"     : { "type" : "string", "minLength": 1, "maxLength": 4096 },
+						"cwd"        : { "type" : "string", "minLength": 1, "maxLength": 4096 },
+						"persistent" : { "type" : "boolean" },
+						"executable" : { "type" : "boolean" },
+						"count"      : { "type" : "integer", "minimum" : 0 },
+						"timeout"    : { "type" : "integer", "minimum" : 0 },
+						"runtime"    : { "type" : "integer", "minimum" : 0 },
+
+						"arguments": {
+							"type"     : "array",
+							"minItems" : 0,
+							"items"    : {
+								"oneOf": [
+									{ "type": "string", "minLength": 0, "maxLength": 4096 },
+									{ "type": "number" },
+									{
+										"type"     : "array",
+										"minItems" : 0,
+										"items"    : {
+											"oneOf": [
+												{ "type": "string", "minLength": 0, "maxLength": 4096 },
+												{ "type": "number" }
+											]
+										}
+									}
+								]
+							}
+						},
+
+						"watch": {
+							"type"     : "array",
+							"minItems" : 0,
+							"items"    : { "type": "string", "minLength": 1, "maxLength": 4096 }
+						},
+
+						"env": {
+							"type": "object",
+							"patternProperties": {
+								".": {
+									"oneOf": [
+										{ "type": "string", "minLength": 0, "maxLength": 4096 },
+										{ "type": "boolean" }
+									]
+								}
+							},
+
+							"additionalProperties": false
+						}
+					},
+
+					"required": ["count", "source"],
+
+					"additionalProperties": false
+				}
+			},
+
+			"minProperties": 1,
+
+			"additionalProperties": false
+		}
+	},
+
+	"required": ["tasks"],
+
+	"additionalProperties": false
+}

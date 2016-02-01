@@ -1,31 +1,36 @@
 {
-	"name": "weaver",
-	"version": "0.1.1",
-	"description": "Interactive process management system",
-	"keywords": ["daemon", "process", "udp", "log", "tools"],
-	"main": "lib/weaver.js",
-	"license": "LGPL-3.0",
-	"preferGlobal": true,
-	"author": "Alexander Nazarov <n4kz@n4kz.com>",
+	"name"         : "weaver",
+	"version"      : "0.1.1",
+	"license"      : "LGPL-3.0",
+	"author"       : "Alexander Nazarov <n4kz@n4kz.com>",
+
+	"description"  : "Interactive process management system",
+	"keywords"     : ["daemon", "process", "udp", "log", "tools"],
+
+	"main"         : "lib/weaver.js",
+	"preferGlobal" : true,
+
+	"repository": {
+		"type" : "git",
+		"url"  : "git://github.com/n4kz/weaver.git"
+	},
+
+	"dependencies": {
+		"glob"     : "*",
+		"optimist" : "*",
+		"sprintf"  : "*",
+		"z-schema" : "*"
+	},
+
+	"devDependencies": {
+		"coffee-script" : ">=1.6.0",
+		"vows"          : "*"
+	},
+
 	"bin": {
 		"weaver": "bin/weaver"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/n4kz/weaver.git"
-	},
-	"dependencies": {
-		"glob": "*",
-		"sprintf": "*",
-		"optimist": "*"
-	},
-	"devDependencies": {
-		"coffee-script": ">=1.6.0",
-		"vows": "*"
-	},
-	"engines": {
-		"node": ">=0.6.0"
-	},
+
 	"scripts": {
 		"test": "make"
 	}
