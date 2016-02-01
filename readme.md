@@ -124,6 +124,8 @@ Bash commands to start processes manually in same way as weaver does in example 
 - `cwd`        Task group working directory. Defaults to path. Optional
 - `runtime`    Minimal runtime required for persistent task to be restarted after unclean exit
 
+Configuration file is validated with JSON Schema from file `lib/schema.json`.
+
 # Logs
 
 Weaver will collect logs for you and send anything from subtasks stdout and stderr to udp4:localhost:8092 (or any other port of your choice).
@@ -138,7 +140,7 @@ Or any other program capable to capture udp
 
 # Copyright and License
 
-Copyright 2012-2014 Alexander Nazarov. All rights reserved.
+Copyright 2012-2016 Alexander Nazarov. All rights reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
