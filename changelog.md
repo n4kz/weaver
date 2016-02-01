@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+Released 2016-02-01
+
+* JSON Schema validation for config file
+
 ## 0.1.1
 
 Released 2014-02-07
