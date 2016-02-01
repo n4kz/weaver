@@ -113,16 +113,16 @@ Bash commands to start processes manually in same way as weaver does in example 
 
 - `path`       Path to working directory, relative to configuration file or absolute. Optional
 - `tasks`      Task groups
-- `count`      Task count for group
-- `source`     Source file for task group
+- `count`      Task count for group. Can be zero
+- `source`     Source file or executable for task group
 - `persistent` Restart task on unclean exit. Defaults to false. Boolean. Optional
 - `executable` Source is executable itself and v8 instance is not needed to run it. Defaults to false. Boolean. Optional
 - `arguments`  Arguments for tasks in task group. Nested array should have length equal to task count. Optional
 - `env`        Environment variables for task group. Optional
 - `watch`      Restart all tasks in task group when one of watched files was modified. Optional
 - `timeout`    Timeout between SIGINT and SIGTERM for stop and restart commands. Defaults to 1000ms. Optional
+- `runtime`    Minimal runtime required for persistent task to be restarted after unclean exit. Defaults to 1000ms. Optional
 - `cwd`        Task group working directory. Defaults to path. Optional
-- `runtime`    Minimal runtime required for persistent task to be restarted after unclean exit
 
 Configuration file is validated with JSON Schema from file `lib/schema.json`.
 
