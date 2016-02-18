@@ -59,7 +59,7 @@ var command,
 		})
 		.argv;
 
-command = argv._[0];
+command = argv._.shift();
 
 if (!command) {
 	argv.daemon  = true;
@@ -82,9 +82,7 @@ if (argv.version) {
 if (!argv.daemon) {
 	switch (command) {
 		case 'kill':
-			if (!argv._.length) {
-				ok = false;
-			}
+			ok = !!argv._.length;
 			break;
 
 		case 'stop':
@@ -96,11 +94,10 @@ if (!argv.daemon) {
 		case 'dump':
 		case 'monitor':
 		case 'exit':
-			if (argv._.length !== 1) {
-				ok = false;
-			}
+			ok = !argv._.length;
 			break;
 
+		/* Unknown command */
 		default:
 			ok = false;
 	}
