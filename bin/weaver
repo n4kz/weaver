@@ -13,7 +13,6 @@ var command,
 	dirname  = require('path').dirname,
 	exists   = require('fs').existsSync,
 	optimist = require('optimist'),
-	report   = {},
 	sprintf  = require('sprintf').sprintf,
 	argv     = optimist
 		.boolean(['help', 'debug', 'nocolor', 'version'])
@@ -157,40 +156,44 @@ if (argv.daemon) {
 
 	udp.bind(argv.port);
 } else {
-	var response = '',
-		data     = command,
-		socket   = net.connect(argv.port);
+	var socket   = net.connect(argv.port),
+		response = '',
+		data, parameters;
 
 	/* Send arguments */
 	switch (command) {
 		case 'upgrade':
 			if (argv.config) {
-				data += '\r\n';
-				data += JSON.stringify([resolve(argv.config)]);
+				parameters = JSON.stringify([resolve(argv.config)]);
 			}
 			break;
 
 		case 'kill':
+			var signal = argv._.shift()
+				.replace(/^(?!sig)/i, 'sig')
+				.toUpperCase();
+
+			parameters = JSON.stringify([signal].concat(argv._));
+			break;
+
 		case 'stop':
 		case 'restart':
-			if (command === 'kill') {
-				argv._[1] = argv._[1]
-					.replace(/^(?!sig)/i, 'sig')
-					.toUpperCase()
-			}
-
-			data += '\r\n';
-			data += JSON.stringify(argv._.slice(1));
+			parameters = JSON.stringify(argv._);
 			break;
 	}
 
-	socket.once('connect', socket.write.bind(socket, data + '\r\n'));
+	data = [command, parameters || '[]', '']
+		.join('\r\n');
 
+	socket.once('connect', socket.write.bind(socket, data));
+
+	/* Handle errors */
 	socket.on('error', function (error) {
 		console.warn('Could not connect to weaver on port ' + argv.port);
 		process.exit(1);
 	});
 
+	/* Receive response */
 	socket.on('data', function (data) {
 		if (data instanceof Buffer) {
 			data = data.toString();
@@ -199,36 +202,39 @@ if (argv.daemon) {
 		response += data;
 	});
 
+	/* Handle response */
 	socket.once('end', function () {
-		response = JSON.parse(response);
+		var result = JSON.parse(response);
 
-		if (response.status !== 'ok') {
-			console.warn(response.message);
-			return;
-		}
+		if (result.status === 'ok') {
+			switch (command) {
+				case 'status':
+					printStatus(result);
+					break;
 
-		switch (command) {
-			case 'status':
-				console.log(
-					green + sprintf('%5u', response.pid) + clear +
-					(argv.nocolor? '  ' : '') +
-					sprintf(' %3s', elapsed(response.uptime)) +
-					' weaver ' + response.version + ' (' + yellow + response.memory + 'K' + clear + ')'
-				);
-
-			case 'dump':
-				report[command](response);
-				break;
+				case 'dump':
+					printDump(result);
+					break;
+			}
+		} else {
+			console.warn(result.message);
 		}
 	});
 }
 
-report.status = function (result) {
+function printStatus (result) {
 	var tasks   = result.tasks,
 		lname   = 0,
 		lsource = 0,
 		now     = Date.now(),
 		name, task, subtasks, i, l, pid, status, color;
+
+	console.log(
+		green + sprintf('%5u', result.pid) + clear +
+		(argv.nocolor? '  ' : '') +
+		sprintf(' %3s', elapsed(result.uptime)) +
+		' weaver ' + result.version + ' (' + yellow + result.memory + 'K' + clear + ')'
+	);
 
 	for (name in tasks) {
 		if (!tasks.hasOwnProperty(name)) {
@@ -277,19 +283,19 @@ report.status = function (result) {
 				color +
 				sprintf('%5u', subtasks[i].pid) +
 				clear +
-				(color? '' : ' ' + status) +
+				(argv.nocolor? ' ' + status : '') +
 				sprintf(' %3s', elapsed(subtasks[i].uptime)) +
 				sprintf(' %-' + lname + 's %-' + lsource + 's %s', name, task.source, subtasks[i].args.join(' '))
 			);
 		}
 	}
-};
+}
 
-report.dump = function (result) {
+function printDump (result) {
 	var inspect = require('util').inspect;
 
 	console.log(inspect(result.config, false, null, !argv.nocolor));
-};
+}
 
 function elapsed (delta) {
 	delta /= 1000;
