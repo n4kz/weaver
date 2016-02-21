@@ -6,11 +6,8 @@ var red      = '\033[01;31m',
 
 'use strict';
 
-var command,
-	ok       = true,
-	net      = require('net'),
+var net      = require('net'),
 	resolve  = require('path').resolve,
-	dirname  = require('path').dirname,
 	exists   = require('fs').existsSync,
 	optimist = require('optimist'),
 	sprintf  = require('sprintf').sprintf,
@@ -18,6 +15,7 @@ var command,
 		.boolean(['help', 'debug', 'nocolor', 'version'])
 		.default('port', process.env.WEAVER_PORT || 8092)
 		.default('debug', !!process.env.WEAVER_DEBUG)
+		.default('config', 'weaver.json')
 		.usage([
 			'Usage:',
 			'    weaver [--port <number>] [--config <path>] [--debug]',
@@ -32,7 +30,7 @@ var command,
 			'',
 			'Commands:',
 			'    upgrade',
-			'        Change or re-read config file',
+			'        Re-read config file',
 			'    restart',
 			'        Restart all tasks, task group, task by pid',
 			'    stop',
@@ -50,16 +48,16 @@ var command,
 			''
 		].join('\n'))
 		.describe({
-			config  : 'Configuration file. Required to start daemon with predefined tasks',
+			config  : 'Configuration file',
 			debug   : 'Do not fork and give additional output. Makes sense only for start',
 			nocolor : 'Do not use colors for output',
 			help    : 'Show help and exit',
 			version : 'Show version and exit',
 			port    : 'Use specified port'
 		})
-		.argv;
-
-command = argv._.shift();
+		.argv,
+	command = argv._.shift(),
+	ok      = true;
 
 if (!command) {
 	argv.daemon  = true;
@@ -90,6 +88,9 @@ if (!argv.daemon) {
 			break;
 
 		case 'upgrade':
+			ok = exists(argv.config) && !argv._.length;
+			break;
+
 		case 'status':
 		case 'dump':
 		case 'monitor':
@@ -117,21 +118,19 @@ if (!ok) {
 }
 
 if (argv.daemon) {
-	if (!argv.config && exists('weaver.json')) {
-		argv.config = 'weaver.json';
-	}
-
 	var code   = 0,
 		daemon = require((process.env.WEAVER_TEST? '..' : 'weaver') + '/lib/daemon'),
-		child  = require('child_process').spawn(daemon, [JSON.stringify({
-				config: argv.config? resolve(argv.config) : null,
-				port: argv.port,
-				debug: argv.debug
-			})], {
-			detached: !argv.debug,
-			stdio: argv.debug? 'inherit' : ['ignore', 'ignore', 'pipe'],
-			env: process.env
-		});
+		child  = require('child_process').spawn(daemon, [
+				JSON.stringify({
+					config : exists(argv.config)? resolve(argv.config) : null,
+					port   : argv.port,
+					debug  : argv.debug
+				})
+			], {
+				detached : !argv.debug,
+				stdio    : argv.debug? 'inherit' : ['ignore', 'ignore', 'pipe'],
+				env      : process.env
+			});
 
 	if (!argv.debug) {
 		child.stderr.on('data', function (data) {
@@ -161,12 +160,10 @@ if (argv.daemon) {
 		response = '',
 		data, parameters;
 
-	/* Send arguments */
+	/* Prepare arguments */
 	switch (command) {
 		case 'upgrade':
-			if (argv.config) {
-				parameters = JSON.stringify([resolve(argv.config)]);
-			}
+			parameters = JSON.stringify([resolve(argv.config)]);
 			break;
 
 		case 'kill':
@@ -186,6 +183,7 @@ if (argv.daemon) {
 	data = [command, parameters || '[]', '']
 		.join('\r\n');
 
+	/* Send command and arguments */
 	socket.once('connect', socket.write.bind(socket, data));
 
 	/* Handle errors */

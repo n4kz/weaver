@@ -7,7 +7,7 @@ methods = [
 	'status', 'command'
 ]
 
-events = ['error', 'config', 'upgrade']
+events = ['error', 'upgrade']
 
 (require 'vows')
 	.describe('basic')
@@ -30,9 +30,6 @@ events = ['error', 'config', 'upgrade']
 
 			# parameters
 			assert.deepEqual weaver.parameters, {}
-
-			# file
-			assert.equal weaver.file, ''
 
 		methods: ->
 			for method in methods

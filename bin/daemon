@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
-var udp    = require('dgram').createSocket('udp4'),
-	net    = require('net'),
-	log    = console.log,
-	params = JSON.parse(process.argv[2]),
-	Weaver = require('../lib/weaver');
+var udp     = require('dgram').createSocket('udp4'),
+	net     = require('net'),
+	fs      = require('fs'),
+	dirname = require('path').dirname,
+	log     = console.log,
+	params  = JSON.parse(process.argv[2]),
+	Weaver  = require('../lib/weaver');
 
 if (!params.debug) {
 	/* Send stdout and stderr to udp */
@@ -29,8 +31,7 @@ Weaver.log = function (message) {
 
 /* Read config file */
 if (params.config) {
-	Weaver.file = params.config;
-	Weaver.emit('config');
+	readFile(params.config);
 }
 
 process.chdir('/');
@@ -38,9 +39,8 @@ process.title = 'weaver [' + params.port + ']';
 
 /* Signal handlers */
 process
-	.on('SIGINT',  function () { Weaver.die(2) })
-	.on('SIGTERM', function () { Weaver.die(15) })
-	.on('SIGHUP',  function () { Weaver.emit('config') });
+	.on('SIGINT',  function () { Weaver.die(2)  })
+	.on('SIGTERM', function () { Weaver.die(15) });
 
 /* Setup control interface */
 net.createServer()
@@ -51,28 +51,39 @@ net.createServer()
 
 Weaver.log('Started');
 
+function readFile (filename) {
+	fs.readFile(String(filename), function (error, data) {
+		if (error) {
+			Weaver.emit('error', error);
+		} else {
+			Weaver.upgrade(data, dirname(filename));
+		}
+	});
+}
+
 function execute (data) {
-	var parameters = data.toString().replace(/[\r\n]+$/, '').split('\r\n', 2),
-		command    = parameters[0],
-		result     = {
+	var args   = [],
+		result = {
 			version : Weaver.version,
 			uptime  : Date.now() - Weaver.start,
 			status  : 'ok',
 			pid     : process.pid,
 			memory  : process.memoryUsage().rss >> 10
 		},
-		i, l, args = [];
+		argv, command, params;
 
 	try {
-		parameters = JSON.parse(parameters[1] || '[]');
-	} catch (error) {
-		result.status = 'error';
-		result.message = error.message;
-		error.message = 'Client error: ' + error.message;
+		argv = data.toString()
+			.replace(/[\r\n]+$/, '')
+			.split('\r\n', 2);
 
-		Weaver.emit('error', error);
-		this.end(JSON.stringify(result) + '\r\n');
-		return;
+		command = argv.shift();
+		params  = JSON.parse(argv.shift() || '[]');
+	} catch (error) {
+		result.status  = 'error';
+		result.message = error.message;
+
+		command = null;
 	}
 
 	switch (command) {
@@ -81,14 +92,14 @@ function execute (data) {
 		case 'restart':
 			/* Push signal name to args */
 			if (command === 'kill') {
-				args.push(parameters.shift());
+				args.push(params.shift());
 			}
 
-			if (l = parameters.length) {
+			if (params.length) {
 				/* by name/pid */
-				for (i = 0; i < l; i++) {
-					Weaver.command(command, String(parameters[i]), args);
-				}
+				params.forEach(function (name) {
+					Weaver.command(command, String(name), args);
+				});
 			} else {
 				/* all */
 				Weaver.command(command, null, args);
@@ -102,11 +113,7 @@ function execute (data) {
 			break;
 
 		case 'upgrade':
-			if (parameters[0]) {
-				Weaver.file = parameters[0];
-			}
-
-			Weaver.emit('config');
+			readFile(params.shift());
 			break;
 
 		case 'dump':
@@ -115,6 +122,9 @@ function execute (data) {
 
 		case 'status':
 			result.tasks = Weaver.status();
+			break;
+
+		case null:
 			break;
 
 		default:

@@ -42,7 +42,7 @@ options =
 								arguments: [1000]
 
 					# Run upgrade command
-					command = "#{daemon} upgrade"
+					command = "#{daemon} --config #{config} upgrade"
 					exec command, options, @callback
 					return
 
@@ -80,7 +80,7 @@ options =
 										arguments: ['-a']
 
 							# Run upgrade command
-							command = "#{daemon} upgrade"
+							command = "#{daemon} --config #{config} upgrade"
 							exec command, options, @callback
 							return
 
