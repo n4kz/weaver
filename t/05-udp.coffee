@@ -21,7 +21,11 @@ monitor.stdout.on 'data', (data) -> log = String(data)
 	.addBatch
 		start:
 			topic: ->
-				exec daemon, options, @callback
+				exec daemon, options, (args...) =>
+					setTimeout((=>
+						@callback(args...)
+					), 50)
+
 				return
 
 			code:   (error, stdout, stderr) -> assert not error

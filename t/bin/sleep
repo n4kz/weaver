@@ -1,11 +1,7 @@
-#!/usr/bin/node
+#!/usr/bin/env node
 
 setTimeout(function () {
 	process.exit(0);
 }, process.argv[2] || 10000);
-
-process.on('SIGINT', function () {
-	/* Do nothing */
-});
 
 /* vim: set ft=javascript : */
