@@ -2,7 +2,6 @@ assert  = require('assert')
 weaver  = require('../lib/weaver.js')
 emitter = require('events').EventEmitter
 
-
 methods = [
 	'upgrade', 'upgradeParameter', 'expandEnv', 'get', 'spawn', 'foreach',
 	'killSubtask', 'stopSubtask', 'restartSubtask',
@@ -12,7 +11,7 @@ methods = [
 ]
 
 defaultName = 'test' + Date.now()
-weaver.task(defaultName, {})
+weaver.task defaultName, {}
 
 (require 'vows')
 	.describe('task')
@@ -42,25 +41,22 @@ weaver.task(defaultName, {})
 			task = weaver.tasks[name]
 
 			for method in methods
-			  assert.isFunction task[method]
-			  assert not weaver.propertyIsEnumerable task
+				assert.isFunction task[method]
+				assert not task.propertyIsEnumerable method
 
 		constructor: ->
 			name = Math.random()
-			task = weaver.tasks[name]
 
-			assert.isUndefined task
-
-			task = weaver.task(name)
+			task = weaver.task name, {}
 
 			assert.equal task.constructor, weaver.task
 			assert.equal task, weaver.tasks[name]
 			assert.equal 1000, task.runtime
 			assert.equal 1000, task.timeout
 
-			assert.equal task, weaver.task(name, runtime: 2000)
+			assert.equal task, weaver.task name, runtime: 2000
 			assert.equal 2000, task.runtime
-			assert.equal task, weaver.task(name, timeout: 5000)
+			assert.equal task, weaver.task name, timeout: 5000
 			assert.equal 5000, task.timeout
 			assert.equal task, weaver.tasks[name]
 

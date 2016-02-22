@@ -110,7 +110,7 @@ function execute (data) {
 		case 'drop':
 			params.forEach(function (name) {
 				/* Remove task from configuration */
-				delete Weaver.parameters.tasks[name];
+				delete Weaver.config[name];
 
 				/* Stop subtasks */
 				Weaver.command('stop', String(name), null);
@@ -126,7 +126,7 @@ function execute (data) {
 			break;
 
 		case 'dump':
-			result.config = Weaver.parameters;
+			result.config = Weaver.config;
 			break;
 
 		case 'status':

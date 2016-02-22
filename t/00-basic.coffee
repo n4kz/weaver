@@ -27,9 +27,15 @@ events = ['error', 'upgrade']
 
 			# tasks
 			assert.deepEqual weaver.tasks, {}
+			assert.typeOf    weaver.tasks, 'object'
 
-			# parameters
-			assert.deepEqual weaver.parameters, {}
+			assert.isUndefined weaver.tasks.__proto__
+
+			# config
+			assert.deepEqual weaver.config, {}
+			assert.typeOf    weaver.config, 'object'
+
+			assert.isUndefined weaver.config.__proto__
 
 		methods: ->
 			for method in methods
