@@ -23,6 +23,7 @@ var net      = require('net'),
 			'    weaver [--port <number>] restart [[task|pid], ...]',
 			'    weaver [--port <number>] stop [[task|pid], ...]',
 			'    weaver [--port <number>] kill <signal> [[task|pid], ...]',
+			'    weaver [--port <number>] drop <task>',
 			'    weaver [--port <number>] [--nocolor] status',
 			'    weaver [--port <number>] [--nocolor] dump',
 			'    weaver [--port <number>] monitor',
@@ -37,10 +38,12 @@ var net      = require('net'),
 			'        Stop all tasks, task group, task by pid',
 			'    kill',
 			'        Send signal to task group or task by pid',
+			'    drop',
+			'        Stop task group and remove it from configuration',
 			'    status',
 			'        Show status for all tasks',
 			'    dump',
-			'        Show current weaver configuration',
+			'        Show current configuration',
 			'    monitor',
 			'        Show log messages from running weaver',
 			'    exit',
@@ -79,6 +82,7 @@ if (argv.version) {
 /* Check command */
 if (!argv.daemon) {
 	switch (command) {
+		case 'drop':
 		case 'kill':
 			ok = !!argv._.length;
 			break;
@@ -174,6 +178,7 @@ if (argv.daemon) {
 			parameters = JSON.stringify([signal].concat(argv._));
 			break;
 
+		case 'drop':
 		case 'stop':
 		case 'restart':
 			parameters = JSON.stringify(argv._);

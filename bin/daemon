@@ -105,7 +105,16 @@ function execute (data) {
 				Weaver.command(command, null, args);
 			}
 
-			Weaver.emit('upgrade');
+			break;
+
+		case 'drop':
+			params.forEach(function (name) {
+				/* Remove task from configuration */
+				delete Weaver.parameters.tasks[name];
+
+				/* Stop subtasks */
+				Weaver.command('stop', String(name), null);
+			});
 			break;
 
 		case 'exit':
