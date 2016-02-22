@@ -25,8 +25,6 @@ Weaver.log = function (message) {
 	}
 
 	log(message);
-
-	return Weaver;
 };
 
 /* Read config file */
