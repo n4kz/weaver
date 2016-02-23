@@ -65,7 +65,7 @@ status = []
 						exec "#{daemon} drop s2", options, =>
 							# Get configuration dump
 							exec "#{daemon} dump --nocolor", options, (args...) =>
-								dump = args[1]
+								dump = JSON.parse args[1]
 
 								# Check status
 								exec "#{daemon} status --nocolor", options, (args...) =>
@@ -73,6 +73,7 @@ status = []
 						return
 
 					code:   (error, stdout, stderr, pid, dump) -> assert not error
+					dump:   (error, stdout, stderr, pid, dump) -> assert not dump.hasOwnProperty 's2'
 					stderr: (error, stdout, stderr, pid, dump) -> assert not stderr
 					stdout: (error, stdout, stderr, pid, dump) ->
 						status = stdout
@@ -83,13 +84,11 @@ status = []
 						assert.equal status.length, 5
 
 						assert.match stdout, /^(?:[\s\S](?!s2))+$/
-						assert.match dump,   /^(?:[\s\S](?!s2))+$/
 
 						assert.equal pid[1], status[1]
 						assert.equal pid[2], status[2]
 						assert.equal pid[3], status[3]
 						assert.equal pid[4], status[4]
-
 
 					exit:
 						topic: ->

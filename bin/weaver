@@ -298,7 +298,11 @@ function printStatus (result) {
 function printDump (result) {
 	var inspect = require('util').inspect;
 
-	console.log(inspect(result.config, false, null, !argv.nocolor));
+	if (argv.nocolor) {
+		console.log(JSON.stringify(result.config, null, 4));
+	} else {
+		console.log(inspect(result.config, false, null, !argv.nocolor));
+	}
 }
 
 function elapsed (delta) {
