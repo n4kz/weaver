@@ -19,8 +19,10 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 
 	weaver [--port <number>] [--config <path>] [--debug]
 	weaver [--port <number>] [--config <path>] upgrade
-	weaver [--port <number>] <restart|stop> [[task|pid], ...]
+	weaver [--port <number>] restart [[task|pid], ...]
+	weaver [--port <number>] stop [[task|pid], ...]
 	weaver [--port <number>] kill <signal> [[task|pid], ...]
+	weaver [--port <number>] drop <task>
 	weaver [--port <number>] [--nocolor] status
 	weaver [--port <number>] [--nocolor] dump
 	weaver [--port <number>] monitor
@@ -28,23 +30,23 @@ all binaries in `node_modules/.bin` hidden folder. So you may want to prepend it
 
 # Commands
 
-- `start`   Start daemon if it was not started before. Default command
-- `upgrade` Change or re-read config file
+- `upgrade` Extend configuration with tasks from configuration file
 - `restart` Restart all tasks, task group, task by pid
 - `stop`    Stop all tasks, task group, task by pid
 - `kill`    Send signal to task group or task by pid
+- `drop`    Stop task group and remove it from configuration
 - `status`  Show status for all tasks
-- `dump`    Show current weaver configuration
-- `monitor` Show log messages from running weaver
+- `dump`    Show current configuration
+- `monitor` Stream log messages from daemon
 - `exit`    Stop all tasks and exit
 
 # Options
 
-	--config   Configuration file. Required to start daemon with predefined tasks
-	--debug    Do not fork and give additional output. Makes sense only for start  [boolean]
-	--nocolor  Do not use colors for output                                        [boolean]
-	--help     Show help                                                           [boolean]
-	--version  Show version                                                        [boolean]
+	--config   Configuration file                                                  [default: weaver.json]
+	--debug    Do not fork and give additional output
+	--nocolor  Do not use colors for output
+	--help     Show help and exit
+	--version  Show version and exit
 	--port     Use specified port                                                  [default: 8092]
 
 Also `WEAVER_PORT` and `WEAVER_DEBUG` environment variables can be used to set options, but
@@ -114,7 +116,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 - `path`       Path to working directory, relative to configuration file or absolute. Optional
 - `tasks`      Task groups
 - `count`      Task count for group. Can be zero
-- `source`     Source file or executable for task group
+- `source`     Source file or executable for task group. Relative to `cwd` or absolute
 - `persistent` Restart task on unclean exit. Defaults to false. Boolean. Optional
 - `executable` Source is executable itself and v8 instance is not needed to run it. Defaults to false. Boolean. Optional
 - `arguments`  Arguments for tasks in task group. Nested array should have length equal to task count. Optional
@@ -122,7 +124,7 @@ Bash commands to start processes manually in same way as weaver does in example 
 - `watch`      Restart all tasks in task group when one of watched files was modified. Optional
 - `timeout`    Timeout between SIGINT and SIGTERM for stop and restart commands. Defaults to 1000ms. Optional
 - `runtime`    Minimal runtime required for persistent task to be restarted after unclean exit. Defaults to 1000ms. Optional
-- `cwd`        Task group working directory. Defaults to path. Optional
+- `cwd`        Task group working directory. Relative to `path` or absolute. Optional
 
 Configuration file is validated with JSON Schema from file `lib/schema.json`.
 
