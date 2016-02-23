@@ -11,6 +11,7 @@ var net      = require('net'),
 	exists   = require('fs').existsSync,
 	optimist = require('optimist'),
 	sprintf  = require('sprintf').sprintf,
+	isatty   = require('tty').isatty,
 	argv     = optimist
 		.boolean(['help', 'debug', 'nocolor', 'version'])
 		.default('port', process.env.WEAVER_PORT || 8092)
@@ -62,9 +63,14 @@ var net      = require('net'),
 	command = argv._.shift(),
 	ok      = true;
 
-if (!command) {
-	argv.daemon  = true;
-	argv.nocolor = true;
+/* Disable colors */
+argv.nocolor = argv.nocolor || !isatty(1);
+
+if (argv.nocolor) {
+	red    = '';
+	green  = '';
+	yellow = '';
+	clear  = '';
 }
 
 /* Help requested */
@@ -80,40 +86,34 @@ if (argv.version) {
 }
 
 /* Check command */
-if (!argv.daemon) {
-	switch (command) {
-		case 'drop':
-		case 'kill':
-			ok = !!argv._.length;
-			break;
+switch (command) {
+	case 'drop':
+	case 'kill':
+		ok = !!argv._.length;
+		break;
 
-		case 'stop':
-		case 'restart':
-			break;
+	case 'stop':
+	case 'restart':
+		break;
 
-		case 'upgrade':
-			ok = exists(argv.config) && !argv._.length;
-			break;
+	case 'upgrade':
+		ok = exists(argv.config) && !argv._.length;
+		break;
 
-		case 'status':
-		case 'dump':
-		case 'monitor':
-		case 'exit':
-			ok = !argv._.length;
-			break;
+	case 'status':
+	case 'dump':
+	case 'monitor':
+	case 'exit':
+		ok = !argv._.length;
+		break;
 
-		/* Unknown command */
-		default:
-			ok = false;
-	}
-}
+	/* Daemon mode */
+	case undefined:
+		break;
 
-/* Clear colors */
-if (argv.nocolor) {
-	red    = '';
-	green  = '';
-	yellow = '';
-	clear  = '';
+	/* Unknown command */
+	default:
+		ok = false;
 }
 
 if (!ok) {
@@ -121,7 +121,7 @@ if (!ok) {
 	process.exit(1);
 }
 
-if (argv.daemon) {
+if (!command) {
 	var code   = 0,
 		daemon = require((process.env.WEAVER_TEST? '..' : 'weaver') + '/lib/daemon'),
 		child  = require('child_process').spawn(daemon, [
