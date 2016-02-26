@@ -15,8 +15,7 @@ options =
 	.addBatch
 		version:
 			topic: ->
-				command = "#{daemon} --version"
-				exec command, options, @callback
+				exec "#{daemon} --version", options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert not error
@@ -26,8 +25,7 @@ options =
 
 		help:
 			topic: ->
-				command = "#{daemon} --help"
-				exec command, options, @callback
+				exec "#{daemon} --help", options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert not error
@@ -39,8 +37,7 @@ options =
 
 		status:
 			topic: ->
-				command = "#{daemon} status"
-				exec command, options, @callback
+				exec "#{daemon} status", options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert error?.code
@@ -60,8 +57,7 @@ options =
 
 			status:
 				topic: ->
-					command = "#{daemon} status --nocolor"
-					exec command, options, @callback
+					exec "#{daemon} status --nocolor", options, @callback
 					return
 
 				code:    (error, stdout, stderr) -> assert not error
@@ -73,8 +69,7 @@ options =
 
 			exit:
 				topic: ->
-					command = "#{daemon} exit"
-					exec command, options, @callback
+					exec "#{daemon} exit", options, @callback
 					return
 
 				code:   (error, stdout, stderr) -> assert not error
@@ -83,8 +78,7 @@ options =
 
 				status:
 					topic: ->
-						command = "#{daemon} status"
-						exec command, options, @callback
+						exec "#{daemon} status", options, @callback
 						return
 
 					code:   (error, stdout, stderr) -> assert error?.code

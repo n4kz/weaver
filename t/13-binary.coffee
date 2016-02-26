@@ -28,8 +28,7 @@ options =
 							source: 'bin/borken'
 
 				# Start daemon
-				command = "#{daemon} --config #{config}"
-				exec command, options, @callback
+				exec "#{daemon} --config #{config}", options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert not error
@@ -59,8 +58,7 @@ options =
 						unlink config
 
 						# Stop daemon
-						command = "#{daemon} exit"
-						exec command, options, @callback
+						exec "#{daemon} exit", options, @callback
 						return
 
 					code:   (error, stdout, stderr) -> assert not error

@@ -35,8 +35,7 @@ monitor.stdout.on 'data', (data) -> log = String(data)
 
 			exit:
 				topic: ->
-					command = "#{daemon} exit"
-					exec command, options, (args...) =>
+					exec "#{daemon} exit", options, (args...) =>
 						# Wait for message to arrive
 						setTimeout((=>
 							# Remove zombie

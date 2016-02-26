@@ -27,16 +27,15 @@ status = []
 							count: 4
 							executable: yes
 							source: 'sleep'
-							arguments: [2000]
+							arguments: [4007]
 						s2:
 							count: 2
 							executable: yes
 							source: 'sleep'
-							arguments: [4000]
+							arguments: [2007]
 
 				# Start daemon
-				command = "#{daemon} --config #{config}"
-				exec command, options, @callback
+				exec "#{daemon} --config #{config}", options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert not error
@@ -90,11 +89,10 @@ status = []
 					exit:
 						topic: ->
 							# Remove config file
-							unlink(config)
+							unlink config
 
 							# Stop daemon
-							command = "#{daemon} exit"
-							exec command, options, @callback
+							exec "#{daemon} exit", options, @callback
 							return
 
 						code:   (error, stdout, stderr) -> assert not error
