@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0
+
+Released 2016-02-26
+
+* Upgrade extends weaver configuration instead of replacing it
+* Added drop command
+* Fixed argument validation for kill command
+* Fixed crash on broken executables
+
 ## 0.1.2
 
 Released 2016-02-01
