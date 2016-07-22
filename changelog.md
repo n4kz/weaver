@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+Released 2016-07-22
+
+* Fixed env variable expansion
+* Allowed dots and dashes in task names
+
 ## 0.2.0
 
 Released 2016-02-26
