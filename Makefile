@@ -1,9 +1,9 @@
 test: compile
-	vows --spec -i t/*.js
+	node_modules/.bin/vows --spec -i t/*.js
 	@echo
 
 compile:
-	coffee --compile t/*.coffee
+	node_modules/.bin/coffee --compile t/*.coffee
 
 clean:
 	rm t/*.js
