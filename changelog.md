@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.2.1
+## 0.2.3
+
+Released 2016-08-15
+
+* Fixed task restart during upgrade
+
+## 0.2.2
 
 Released 2016-07-22
 
