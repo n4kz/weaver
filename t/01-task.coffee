@@ -3,7 +3,7 @@ weaver  = require('../lib/weaver.js')
 emitter = require('events').EventEmitter
 
 methods = [
-	'upgrade', 'upgradeParameter', 'expandEnv', 'get', 'spawn', 'foreach',
+	'upgrade', 'upgradeParameter', 'get', 'spawn', 'foreach',
 	'killSubtask', 'stopSubtask', 'restartSubtask',
 	'killPID', 'stopPID', 'restartPID',
 	'stopSubtasks', 'killSubtasks', 'restartSubtasks',
