@@ -17,11 +17,8 @@ options =
 	.addBatch
 		start:
 			topic: ->
-				# Write empty config
-				write config, JSON.stringify tasks: {}
-
 				# Start daemon
-				exec "#{daemon} --config #{config}", options, @callback
+				exec daemon, options, @callback
 				return
 
 			code:   (error, stdout, stderr) -> assert not error
