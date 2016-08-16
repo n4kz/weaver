@@ -1,5 +1,4 @@
 assert  = require('assert')
-weaver  = require('../lib/weaver.js')
 exec    = require('child_process').exec
 spawn   = require('child_process').spawn
 daemon  = '../bin/weaver'
@@ -21,10 +20,7 @@ monitor.stdout.on 'data', (data) -> log = String(data)
 	.addBatch
 		start:
 			topic: ->
-				exec daemon, options, (args...) =>
-					setTimeout((=>
-						@callback(args...)
-					), 50)
+				exec daemon, options, @callback
 
 				return
 
@@ -36,14 +32,10 @@ monitor.stdout.on 'data', (data) -> log = String(data)
 			exit:
 				topic: ->
 					exec "#{daemon} exit", options, (args...) =>
-						# Wait for message to arrive
-						setTimeout((=>
-							# Remove zombie
-							monitor.kill('SIGTERM')
+						monitor.kill('SIGTERM')
 
-							# Run tests
-							@callback(args...)
-						), 50)
+						@callback(args...)
+
 					return
 
 				code:   (error, stdout, stderr) -> assert not error
