@@ -138,16 +138,32 @@ if (!command) {
 
 	if (!argv.debug) {
 		child.stderr.on('data', function (data) {
-			code = 1;
-			process.stderr.write(data.toString());
+			code = 255;
+			process.stderr.write(String(data));
 		});
 
-		setTimeout(function () {
-			/* Wait 150ms for possible errors and exit */
-			process.exit(code);
-		}, 150);
+		function testConnection () {
+			var socket = net.connect(argv.port, function () {
+					if (code) {
+						process.exit(code);
+					} else {
+						child.stderr.unref();
+						child.unref();
+					}
+				});
 
-		child.unref();
+			socket.once('error', function () {
+				if (code) {
+					process.exit(code);
+				} else {
+					setTimeout(testConnection, 50);
+				}
+			});
+
+			socket.unref();
+		}
+
+		setTimeout(testConnection, 50);
 	}
 } else if (command === 'monitor') {
 	var udp    = require('dgram').createSocket('udp4'),
