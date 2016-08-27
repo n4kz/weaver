@@ -16,15 +16,15 @@
 	},
 
 	"dependencies": {
-		"glob"     : "*",
-		"optimist" : "*",
-		"sprintf"  : "*",
-		"z-schema" : "*"
+		"coffee-script" : ">=1.7.1",
+		"glob"          : "*",
+		"optimist"      : "*",
+		"sprintf"       : "*",
+		"z-schema"      : "*"
 	},
 
 	"devDependencies": {
-		"coffee-script" : ">=1.6.0",
-		"vows"          : "*"
+		"vows": "*"
 	},
 
 	"bin": {
