@@ -1,5 +1,4 @@
 assert  = require('assert')
-weaver  = require('../lib/weaver.js')
 exec    = require('child_process').exec
 write   = require('fs').writeFileSync
 unlink  = require('fs').unlinkSync

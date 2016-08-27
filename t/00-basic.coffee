@@ -1,9 +1,11 @@
 assert  = require('assert')
 weaver  = require('../lib/weaver.js')
+Task    = require('../lib/task.coffee')
+Watcher = require('../lib/watcher.coffee')
 emitter = require('events').EventEmitter
 
 methods = [
-	'define', 'task', 'log', 'validate', 'die', 'upgrade',
+	'define', 'log', 'validate', 'die', 'upgrade',
 	'status', 'command'
 ]
 
@@ -24,12 +26,6 @@ events = ['error', 'upgrade']
 			assert.isNumber weaver.start
 			assert weaver.start <= Date.now()
 			assert weaver.start > 0
-
-			# tasks
-			assert.deepEqual weaver.tasks, {}
-			assert.typeOf    weaver.tasks, 'object'
-
-			assert.isUndefined weaver.tasks.__proto__
 
 			# config
 			assert.deepEqual weaver.config, {}
@@ -54,5 +50,24 @@ events = ['error', 'upgrade']
 		events: ->
 			for event in events
 				assert.equal emitter.listenerCount(weaver, event), 1
+
+		watcher: ->
+			assert.isFunction Watcher
+
+			watcher = new Watcher()
+
+			assert.isFunction watcher.stop
+			assert.isFunction watcher.start
+			assert.instanceOf watcher, Watcher
+
+		task: ->
+			assert.isFunction Task
+			assert.isFunction Task.create
+			assert.isFunction Task.status
+
+			assert.deepEqual Task.tasks, {}
+			assert.typeOf    Task.tasks, 'object'
+
+			assert.isUndefined Task.tasks.__proto__
 
 	.export(module)
