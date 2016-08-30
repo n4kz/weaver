@@ -6,4 +6,4 @@ compile:
 	node_modules/.bin/coffee --compile t/*.coffee
 
 clean:
-	rm t/*.js
+	rm -f t/*.js
