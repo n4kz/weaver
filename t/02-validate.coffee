@@ -1,26 +1,25 @@
-assert  = require('assert')
-weaver  = require('../lib/weaver.js')
-emitter = require('events').EventEmitter
+assert = require('assert')
+Weaver = require('../lib/weaver.coffee')
 
 (require 'vows')
 	.describe('validation')
 	.addBatch
 		# Basic validation
 		basic: ->
-			assert.throws -> weaver.validate undefined
-			assert.throws -> weaver.validate null
-			assert.throws -> weaver.validate []
-			assert.throws -> weaver.validate {}
-			assert.throws -> weaver.validate tasks: null
-			assert.throws -> weaver.validate tasks: []
-			assert.throws -> weaver.validate tasks: {}
-			assert.throws -> weaver.validate tasks: test: null
-			assert.throws -> weaver.validate tasks: test: []
-			assert.throws -> weaver.validate tasks: test: {}
+			assert.throws -> Weaver.validate undefined
+			assert.throws -> Weaver.validate null
+			assert.throws -> Weaver.validate []
+			assert.throws -> Weaver.validate {}
+			assert.throws -> Weaver.validate tasks: null
+			assert.throws -> Weaver.validate tasks: []
+			assert.throws -> Weaver.validate tasks: {}
+			assert.throws -> Weaver.validate tasks: test: null
+			assert.throws -> Weaver.validate tasks: test: []
+			assert.throws -> Weaver.validate tasks: test: {}
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -29,7 +28,7 @@ emitter = require('events').EventEmitter
 		'path': ->
 			# Path should be string
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					path: null
 					tasks:
 						test:
@@ -38,7 +37,7 @@ emitter = require('events').EventEmitter
 
 			# Path should not be empty
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					path: ''
 					tasks:
 						test:
@@ -47,7 +46,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					path: '.'
 					tasks:
 						test:
@@ -57,28 +56,28 @@ emitter = require('events').EventEmitter
 		'count': ->
 			# Count should be present
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
 
 			# Count should be number
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
 							count: null
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
 							count: 'test'
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -86,7 +85,7 @@ emitter = require('events').EventEmitter
 
 			# Count should be positive or zero
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -94,7 +93,7 @@ emitter = require('events').EventEmitter
 
 			# Count should not be fractional
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -103,28 +102,28 @@ emitter = require('events').EventEmitter
 		'source': ->
 			# Source should be present
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							count: 0
 
 			# Source should be string
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: null
 							count: 0
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: true
 							count: 0
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 0
@@ -132,7 +131,7 @@ emitter = require('events').EventEmitter
 
 			# Source should not be empty
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: ''
@@ -141,7 +140,7 @@ emitter = require('events').EventEmitter
 		'cwd': ->
 			# cwd should be string
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -149,7 +148,7 @@ emitter = require('events').EventEmitter
 							count: 0
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -158,7 +157,7 @@ emitter = require('events').EventEmitter
 
 			# cwd should be empty
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -167,7 +166,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -177,7 +176,7 @@ emitter = require('events').EventEmitter
 		'timeout': ->
 			# Timeout should be number
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -185,7 +184,7 @@ emitter = require('events').EventEmitter
 							timeout: null
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -194,7 +193,7 @@ emitter = require('events').EventEmitter
 
 			# Timeout should be positive or zero
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -203,7 +202,7 @@ emitter = require('events').EventEmitter
 
 			# Timeout should not be fractional
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -213,7 +212,7 @@ emitter = require('events').EventEmitter
 		'runtime': ->
 			# Runtime should be number
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -221,7 +220,7 @@ emitter = require('events').EventEmitter
 							runtime: null
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -230,7 +229,7 @@ emitter = require('events').EventEmitter
 
 			# Runtime should be positive or zero
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -239,7 +238,7 @@ emitter = require('events').EventEmitter
 
 			# Runtime should not be fractional
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -249,7 +248,7 @@ emitter = require('events').EventEmitter
 		'persistent': ->
 			# Should be boolean
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -258,7 +257,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -268,7 +267,7 @@ emitter = require('events').EventEmitter
 		'executable': ->
 			# Should be boolean
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -277,7 +276,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -287,7 +286,7 @@ emitter = require('events').EventEmitter
 		'watch': ->
 			# Only array allowed
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -295,7 +294,7 @@ emitter = require('events').EventEmitter
 							watch: null
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -304,7 +303,7 @@ emitter = require('events').EventEmitter
 
 			# Empty is okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -313,7 +312,7 @@ emitter = require('events').EventEmitter
 
 			# Only string patterns allowed
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -322,7 +321,7 @@ emitter = require('events').EventEmitter
 
 			# No empty strings
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -331,7 +330,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -342,7 +341,7 @@ emitter = require('events').EventEmitter
 		'arguments': ->
 			# Only array allowed
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -350,7 +349,7 @@ emitter = require('events').EventEmitter
 							arguments: null
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -359,7 +358,7 @@ emitter = require('events').EventEmitter
 
 			# Empty array is okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -368,7 +367,7 @@ emitter = require('events').EventEmitter
 
 			# Null not allowed
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -377,7 +376,7 @@ emitter = require('events').EventEmitter
 
 			# Object not allowed
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -386,7 +385,7 @@ emitter = require('events').EventEmitter
 
 			# Boolean not allowed
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -395,7 +394,7 @@ emitter = require('events').EventEmitter
 
 			# Nested array length should match task count option count
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -404,7 +403,7 @@ emitter = require('events').EventEmitter
 
 			# Empty nested array is okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -413,7 +412,7 @@ emitter = require('events').EventEmitter
 
 			# Empty strings are okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -422,7 +421,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -432,7 +431,7 @@ emitter = require('events').EventEmitter
 		'env': ->
 			# Env should be object
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -440,7 +439,7 @@ emitter = require('events').EventEmitter
 							env: null
 
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -449,7 +448,7 @@ emitter = require('events').EventEmitter
 
 			# Values should be strings or boolean
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -459,7 +458,7 @@ emitter = require('events').EventEmitter
 
 			# Empty object is okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -468,7 +467,7 @@ emitter = require('events').EventEmitter
 
 			# Okay
 			assert.doesNotThrow ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'
@@ -481,7 +480,7 @@ emitter = require('events').EventEmitter
 		'name': ->
 			# Task without a name
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						'':
 							source: 'test'
@@ -489,7 +488,7 @@ emitter = require('events').EventEmitter
 
 			# Task with fancy name
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						'❄':
 							source: 'test'
@@ -498,7 +497,7 @@ emitter = require('events').EventEmitter
 		'unexpected': ->
 			# Unexpected parameters on top level
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					whoa: 'so unexpected'
 					tasks:
 						test:
@@ -507,7 +506,7 @@ emitter = require('events').EventEmitter
 
 			# Unexpected parameters for task
 			assert.throws ->
-				weaver.validate
+				Weaver.validate
 					tasks:
 						test:
 							source: 'test'

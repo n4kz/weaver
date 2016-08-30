@@ -1,5 +1,5 @@
 assert  = require('assert')
-weaver  = require('../lib/weaver.js')
+Weaver  = require('../lib/weaver.coffee')
 exec    = require('child_process').exec
 daemon  = '../bin/weaver'
 port    = 58004
@@ -21,7 +21,7 @@ options =
 			code:   (error, stdout, stderr) -> assert not error
 			stderr: (error, stdout, stderr) -> assert not stderr
 			stdout: (error, stdout, stderr) ->
-				assert.include stdout, weaver.version
+				assert.include stdout, Weaver.version
 
 		help:
 			topic: ->
@@ -62,7 +62,7 @@ options =
 
 				code:    (error, stdout, stderr) -> assert not error
 				stderr:  (error, stdout, stderr) -> assert not stderr
-				version: (error, stdout, stderr) -> assert.include stdout, weaver.version
+				version: (error, stdout, stderr) -> assert.include stdout, Weaver.version
 				name:    (error, stdout, stderr) -> assert.include stdout, 'weaver'
 				pid:     (error, stdout, stderr) -> assert.match stdout, /^\s*\d+\s/
 				memory:  (error, stdout, stderr) -> assert.match stdout, /\s\(\d+K\)/

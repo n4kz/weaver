@@ -1,11 +1,11 @@
-assert  = require('assert')
-weaver  = require('../lib/weaver.js')
-Task    = require('../lib/task.coffee')
-Watcher = require('../lib/watcher.coffee')
-emitter = require('events').EventEmitter
+assert       = require('assert')
+Weaver       = require('../lib/weaver.coffee')
+Task         = require('../lib/task.coffee')
+Watcher      = require('../lib/watcher.coffee')
+EventEmitter = require('events').EventEmitter
 
 methods = [
-	'define', 'log', 'validate', 'die', 'upgrade',
+	'log', 'validate', 'die', 'upgrade',
 	'status', 'command'
 ]
 
@@ -15,41 +15,31 @@ events = ['error', 'upgrade']
 	.describe('basic')
 	.addBatch
 		constructor: ->
-			assert.instanceOf weaver, weaver.constructor
-			assert.instanceOf weaver, emitter
+			assert.instanceOf Weaver, Weaver.constructor
+			assert.instanceOf Weaver, EventEmitter
 
 		properties: ->
 			# version
-			assert.equal weaver.version, require('../package').version
+			assert.equal Weaver.version, require('../package').version
 
 			# start
-			assert.isNumber weaver.start
-			assert weaver.start <= Date.now()
-			assert weaver.start > 0
+			assert.isNumber Weaver.start
+			assert Weaver.start <= Date.now()
+			assert Weaver.start > 0
 
 			# config
-			assert.deepEqual weaver.config, {}
-			assert.typeOf    weaver.config, 'object'
+			assert.deepEqual Weaver.config, {}
+			assert.typeOf    Weaver.config, 'object'
 
-			assert.isUndefined weaver.config.__proto__
+			assert.isUndefined Weaver.config.__proto__
 
 		methods: ->
 			for method in methods
-				assert.isFunction weaver[method]
-				assert not weaver.propertyIsEnumerable method
-
-		define: ->
-			noop = ->
-
-			weaver.define 'method', 'noop', noop
-
-			# New method defined
-			assert.equal weaver.noop, noop
-			assert not weaver.propertyIsEnumerable 'noop'
+				assert.isFunction Weaver[method]
 
 		events: ->
 			for event in events
-				assert.equal emitter.listenerCount(weaver, event), 1
+				assert.equal EventEmitter.listenerCount(Weaver, event), 1
 
 		watcher: ->
 			assert.isFunction Watcher

@@ -1,7 +1,5 @@
 assert  = require('assert')
-weaver  = require('../lib/weaver.js')
 Task    = require('../lib/task.coffee')
-emitter = require('events').EventEmitter
 
 methods = [
 	'upgrade', 'upgradeParameter', 'spawn', 'foreach',
