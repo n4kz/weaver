@@ -12,6 +12,9 @@ options =
 		WEAVER_TEST: 1
 		WEAVER_PORT: port
 
+bpid1 = 0
+bpid2 = 0
+
 (require 'vows')
 	.describe('upgrade')
 	.addBatch
@@ -91,10 +94,10 @@ options =
 
 								assert.equal status.length, 4
 								assert.match status[1], /^ *(\d+) +W +\d+s +base +sleep 2006/
-								pid1 = +RegExp.$1
+								bpid1 = pid1 = +RegExp.$1
 
 								assert.match status[2], /^ *(\d+) +W +\d+s +base +sleep 2006/
-								pid2 = +RegExp.$1
+								bpid2 = pid2 = +RegExp.$1
 
 								assert.match status[3], /^ *(\d+) +D +\d+s +bonus +uname -a/
 								pid3 = +RegExp.$1
@@ -144,6 +147,10 @@ options =
 
 										assert.match status[4], /^ *(\d+) +W +\d+s +new +sleep 1006/
 										pid4 = +RegExp.$1
+
+										# Base subtasks should retain pids
+										assert.equal bpid1, pid1
+										assert.equal bpid2, pid2
 
 										assert.notEqual pid1, pid2
 										assert.notEqual pid1, pid3
