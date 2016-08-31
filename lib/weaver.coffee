@@ -71,11 +71,7 @@ class Weaver extends EventEmitter
 
 	# Get status report
 	status: ->
-		status = Task.status()
-
-		@log(JSON.stringify(status))
-
-		return status#Task.status()
+		return Task.status()
 
 	# Execute command with given arguments
 	command: (action, name, args) ->
