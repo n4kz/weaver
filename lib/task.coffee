@@ -254,9 +254,16 @@ class Task extends EventEmitter
 	dropSubtasks: ->
 		if @active
 			@active = no
-			@stopSubtasks()
+
+			unless @activeSubtasks().length
+				delete Task.tasks[@name]
+			else
+				@stopSubtasks()
 
 		return
+
+	activeSubtasks: ->
+		return @subtasks.filter((subtask) -> subtask.pid)
 
 	exitHandler: (subtask, code, signal) ->
 		restartRequired = @persistent
@@ -296,7 +303,7 @@ class Task extends EventEmitter
 		unless @active
 			restartRequired = no
 
-			unless @subtasks.filter((subtask) -> !!subtask.pid).length
+			unless @activeSubtasks().length
 				delete Task.tasks[@name]
 
 		if restartRequired
