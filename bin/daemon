@@ -3,53 +3,59 @@
 
 require('coffee-script/register');
 
-var udp     = require('dgram').createSocket('udp4'),
-	net     = require('net'),
+var net     = require('net'),
 	fs      = require('fs'),
+	udp     = require('dgram').createSocket('udp4'),
 	dirname = require('path').dirname,
-	log     = console.log,
 	params  = JSON.parse(process.argv[2]),
 	Weaver  = require('../lib/weaver');
 
-if (!params.debug) {
-	/* Send stdout and stderr to udp */
-	log = function (data) {
-		data = new Buffer(data + '\n');
-		udp.send(data, 0, data.length, params.port, 'localhost');
-	};
-}
-
-Weaver.log = function (message) {
-	if (this === Weaver) {
-		message = process.pid + ' (weaver) ' + message;
-	} else {
-		message = message.slice(0);
-	}
-
-	log(message);
-};
-
-/* Read config file */
-if (params.config) {
-	readFile(params.config);
-}
-
-process.chdir('/');
-process.title = 'weaver [' + params.port + ']';
-
-/* Signal handlers */
-process
-	.on('SIGINT',  function () { Weaver.die(2)  })
-	.on('SIGTERM', function () { Weaver.die(15) });
-
 /* Setup control interface */
-net.createServer()
+var server = net.createServer()
 	.listen(params.port, 'localhost')
 	.on('connection', function (socket) {
 		socket.once('data', execute);
 	});
 
+process.chdir('/');
+process.title = 'weaver [' + params.port + ']';
+
+process
+	/* Setup signal handlers */
+	.on('SIGINT',  function () { Weaver.die(2)  })
+	.on('SIGTERM', function () { Weaver.die(15) })
+
+	/* Setup exception handler */
+	.once('uncaughtException', function (error) {
+		/* Try to log exception */
+		Weaver.log(error.stack);
+
+		/* Shutdown control interface */
+		server.close();
+
+		/* Try to exit gracefully */
+		Weaver.die(255);
+	});
+
+/* Setup exit handler */
+Weaver.once('exit', function (code) {
+	Weaver.log('Terminated with code ' + code, function () {
+		udp.close(function () {
+			if (code) {
+				/* XXX: Not waiting for TCP on unclean exit */
+				process.exit(code);
+			}
+		});
+	});
+});
+
+Weaver.log = log;
 Weaver.log('Started');
+
+/* Read config file */
+if (params.config) {
+	readFile(params.config);
+}
 
 function readFile (filename) {
 	fs.readFile(String(filename), function (error, data) {
@@ -62,7 +68,8 @@ function readFile (filename) {
 }
 
 function execute (data) {
-	var args   = [],
+	var socket = this,
+		args   = [],
 		result = {
 			version : Weaver.version,
 			uptime  : Date.now() - Weaver.start,
@@ -70,7 +77,7 @@ function execute (data) {
 			pid     : process.pid,
 			memory  : process.memoryUsage().rss >> 10
 		},
-		argv, command, params;
+		argv, command, params, data;
 
 	try {
 		argv = data.toString()
@@ -140,8 +147,43 @@ function execute (data) {
 			result.message = 'Unknown command';
 	}
 
-	/* Do not close socket on exit */
-	this[command === 'exit'? 'write' : 'end'](JSON.stringify(result) + '\r\n');
+	data = JSON.stringify(result) + '\r\n';
+
+	if (command === 'exit') {
+		server.close();
+
+		Weaver.once('exit', function (code) {
+			socket.end(data);
+		});
+	} else {
+		socket.end(data);
+	}
+}
+
+function log (message, callback) {
+	if (this === Weaver) {
+		message = process.pid + ' (weaver) ' + message;
+	} else {
+		message = message.slice(0);
+	}
+
+	var data = new Buffer(message + '\n');
+
+	if (params.debug) {
+		fs.writeSync(1, String(data));
+	}
+
+	udp.send(data, 0, data.length, params.port, 'localhost', function (error) {
+		/* Log errors to STDERR */
+		if (error) {
+			fs.writeSync(2, error.stack + '\n');
+		}
+
+		/* Execute callback if any */
+		if (typeof callback === 'function') {
+			callback(error);
+		}
+	});
 }
 
 /* vim: set ft=javascript : */

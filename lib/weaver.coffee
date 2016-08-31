@@ -104,25 +104,27 @@ class Weaver extends EventEmitter
 
 		return
 
-	# Send SIGTERM to all processes and exit
+	# Stop all subtasks and exit
 	die: (code) ->
-		timeout = 100
+		code = if code? then code else 1
+
+		tryExit = =>
+			for own name, task of Task.tasks
+				for subtask in task.subtasks
+					return if subtask.pid
+
+			@emit('exit', code)
+
+			return
 
 		for own name, task of Task.tasks
 			if task.timeout > timeout
 				timeout = task.timeout
 
-			task.persistent = no
-			task.stopSubtasks()
+			task.dropSubtasks()
+			task.on('exit', tryExit)
 
-		setTimeout((=>
-			code = if code? then code else 1
-			@log("Terminated with code #{code}")
-
-			setTimeout((->
-				process.exit(code)
-			), 100)
-		), timeout)
+		setImmediate(tryExit)
 
 		return
 
