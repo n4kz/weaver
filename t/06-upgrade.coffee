@@ -46,7 +46,9 @@ bpid2 = 0
 				status:
 					topic: ->
 						# Check status
-						exec "#{daemon} status --nocolor", options, @callback
+						exec "#{daemon} status", options, (args...) =>
+							setTimeout((=> @callback(args...)), 250)
+
 						return
 
 					code:   (error, stdout, stderr) -> assert not error
@@ -82,7 +84,9 @@ bpid2 = 0
 						status:
 							topic: ->
 								# Check status
-								exec "#{daemon} status --nocolor", options, @callback
+								exec "#{daemon} status", options, (args...) =>
+									setTimeout((=> @callback(args...)), 250)
+
 								return
 
 							code:   (error, stdout, stderr) -> assert not error
@@ -125,7 +129,9 @@ bpid2 = 0
 								status:
 									topic: ->
 										# Check status
-										exec "#{daemon} status --nocolor", options, @callback
+										exec "#{daemon} status", options, (args...) =>
+											setTimeout((=> @callback(args...)), 250)
+
 										return
 
 									code:   (error, stdout, stderr) -> assert not error
