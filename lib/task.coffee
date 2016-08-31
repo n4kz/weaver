@@ -62,6 +62,8 @@ class Task extends EventEmitter
 
 			return
 
+		@on('exit', @exitHandler)
+
 		return @
 
 	# Upgrade task
@@ -145,7 +147,7 @@ class Task extends EventEmitter
 			subtask.process.stderr.on('data', @log.bind(@, "#{subtask.pid} [#{@name}]"))
 
 			# Setup exit handler
-			subtask.process.once('exit', @exitHandler.bind(@, subtask))
+			subtask.process.once('exit', @emit.bind(@, 'exit', subtask))
 
 			@log("Task #{subtask.pid} (#{@name}) spawned")
 		else
