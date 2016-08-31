@@ -57,7 +57,7 @@ options =
 
 			status:
 				topic: ->
-					exec "#{daemon} status --nocolor", options, @callback
+					exec "#{daemon} status", options, @callback
 					return
 
 				code:    (error, stdout, stderr) -> assert not error
@@ -67,24 +67,24 @@ options =
 				pid:     (error, stdout, stderr) -> assert.match stdout, /^\s*\d+\s/
 				memory:  (error, stdout, stderr) -> assert.match stdout, /\s\(\d+K\)/
 
-			exit:
-				topic: ->
-					exec "#{daemon} exit", options, @callback
-					return
-
-				code:   (error, stdout, stderr) -> assert not error
-				stdout: (error, stdout, stderr) -> assert not stdout
-				stderr: (error, stdout, stderr) -> assert not stderr
-
-				status:
+				exit:
 					topic: ->
-						exec "#{daemon} status", options, @callback
+						exec "#{daemon} exit", options, @callback
 						return
 
-					code:   (error, stdout, stderr) -> assert error?.code
+					code:   (error, stdout, stderr) -> assert not error
 					stdout: (error, stdout, stderr) -> assert not stdout
-					stderr: (error, stdout, stderr) ->
-						assert.include stderr, 'Could not connect'
-						assert.include stderr, port
+					stderr: (error, stdout, stderr) -> assert not stderr
+
+					status:
+						topic: ->
+							exec "#{daemon} status", options, @callback
+							return
+
+						code:   (error, stdout, stderr) -> assert error?.code
+						stdout: (error, stdout, stderr) -> assert not stdout
+						stderr: (error, stdout, stderr) ->
+							assert.include stderr, 'Could not connect'
+							assert.include stderr, port
 
 	.export(module)
