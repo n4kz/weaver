@@ -22,8 +22,8 @@ process.title = 'weaver [' + params.port + ']';
 
 process
 	/* Setup signal handlers */
-	.on('SIGINT',  function () { Weaver.die(2)  })
-	.on('SIGTERM', function () { Weaver.die(15) })
+	.on('SIGINT',  function () { Weaver.die(128 + 2)  })
+	.on('SIGTERM', function () { Weaver.die(128 + 15) })
 
 	/* Setup exception handler */
 	.once('uncaughtException', function (error) {
@@ -34,7 +34,7 @@ process
 		server.close();
 
 		/* Try to exit gracefully */
-		Weaver.die(255);
+		Weaver.die(64);
 	});
 
 /* Setup exit handler */
