@@ -32,6 +32,15 @@ class Task extends EventEmitter
 	@create: (name) ->
 		return @tasks[name] ?= new Task(name)
 
+	@destroy: (name) ->
+		if name of @tasks
+			@tasks[name].watcher
+				.stop(@tasks[name].watchHandler)
+
+			delete @tasks[name]
+
+		return
+
 	@status: ->
 		now    = Date.now()
 		status = {}
@@ -256,7 +265,7 @@ class Task extends EventEmitter
 			@active = no
 
 			unless @activeSubtasks().length
-				delete Task.tasks[@name]
+				Task.destroy(@name)
 			else
 				@stopSubtasks()
 
@@ -304,7 +313,7 @@ class Task extends EventEmitter
 			restartRequired = no
 
 			unless @activeSubtasks().length
-				delete Task.tasks[@name]
+				Task.destroy(@name)
 
 		if restartRequired
 			@spawn(subtask.id)

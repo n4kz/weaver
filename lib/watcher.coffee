@@ -31,7 +31,7 @@ watch = (cwd, callback, error, files) ->
 		else
 			# Start watching file
 			watches[file] = [callback]
-			watcher[file] = fs.watch(file, watchHandler.bind(undefined, file))
+			watcher[file] = fs.watch(file, persistent: no, watchHandler.bind(undefined, file))
 
 	return
 

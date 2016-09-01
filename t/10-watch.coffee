@@ -42,7 +42,7 @@ status = []
 			status:
 				topic: ->
 					# Check status
-					exec "#{daemon} status --nocolor", options, (args...) =>
+					exec "#{daemon} status", options, (args...) =>
 						args[1] = args[1]
 							.replace(/\n$/, '')
 							.split(/\n/)
@@ -59,7 +59,7 @@ status = []
 					topic: (pid) ->
 						# Rewrite config
 						write config, configData
-						exec "#{daemon} status --nocolor", options, (args...) => @callback(args..., pid)
+						exec "#{daemon} status", options, (args...) => @callback(args..., pid)
 						return
 
 					code:   (error, stdout, stderr, pid) -> assert not error
@@ -80,7 +80,7 @@ status = []
 					status:
 						topic: ->
 							# Check status
-							exec "#{daemon} status --nocolor", options, (args...) =>
+							exec "#{daemon} status", options, (args...) =>
 								args[1] = args[1]
 									.replace(/\n$/, '')
 									.split(/\n/)
@@ -97,7 +97,7 @@ status = []
 							topic: (pid) ->
 								# Rewrite config
 								write config, configData
-								exec "#{daemon} status --nocolor", options, (args...) => @callback(args..., pid)
+								exec "#{daemon} status", options, (args...) => @callback(args..., pid)
 								return
 
 							code:   (error, stdout, stderr, pid) -> assert not error
