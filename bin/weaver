@@ -122,8 +122,7 @@ if (!ok) {
 }
 
 if (!command) {
-	var code   = 0,
-		daemon = require((process.env.WEAVER_TEST? '..' : 'weaver') + '/lib/daemon'),
+	var daemon = require((process.env.WEAVER_TEST? '..' : 'weaver') + '/lib/daemon'),
 		child  = require('child_process').spawn(daemon, [
 				JSON.stringify({
 					config : exists(argv.config)? resolve(argv.config) : null,
@@ -137,33 +136,30 @@ if (!command) {
 			});
 
 	if (!argv.debug) {
-		child.stderr.on('data', function (data) {
-			code = 255;
-			process.stderr.write(String(data));
+		child.stderr.pipe(process.stderr);
+
+		child.on('exit', function (code, signal) {
+			process.exit(code || 1);
 		});
 
 		function testConnection () {
-			var socket = net.connect(argv.port, function () {
-					if (code) {
-						process.exit(code);
-					} else {
-						child.stderr.unref();
-						child.unref();
-					}
-				});
-
-			socket.once('error', function () {
-				if (code) {
-					process.exit(code);
-				} else {
+			execute(argv.port, 'status', null, function (error, result) {
+				if (error) {
 					setTimeout(testConnection, 50);
+					return;
+				}
+
+				if (result.pid === child.pid) {
+					/* Daemon started */
+					child.stderr.unref();
+					child.unref();
+				} else {
+					/* XXX: Connected to wrong process */
 				}
 			});
-
-			socket.unref();
 		}
 
-		setTimeout(testConnection, 50);
+		setTimeout(testConnection, 100);
 	}
 } else if (command === 'monitor') {
 	var udp    = require('dgram').createSocket('udp4'),
@@ -176,9 +172,7 @@ if (!command) {
 
 	udp.bind(argv.port);
 } else {
-	var socket   = net.connect(argv.port),
-		response = '',
-		data, parameters;
+	var parameters;
 
 	/* Prepare arguments */
 	switch (command) {
@@ -201,30 +195,11 @@ if (!command) {
 			break;
 	}
 
-	data = [command, parameters || '[]', '']
-		.join('\r\n');
-
-	/* Send command and arguments */
-	socket.once('connect', socket.write.bind(socket, data));
-
-	/* Handle errors */
-	socket.on('error', function (error) {
-		console.warn('Could not connect to weaver on port ' + argv.port);
-		process.exit(1);
-	});
-
-	/* Receive response */
-	socket.on('data', function (data) {
-		if (data instanceof Buffer) {
-			data = data.toString();
+	execute(argv.port, command, parameters, function (error, result) {
+		if (error) {
+			console.warn('Could not connect to weaver on port ' + argv.port);
+			process.exit(1);
 		}
-
-		response += data;
-	});
-
-	/* Handle response */
-	socket.once('end', function () {
-		var result = JSON.parse(response);
 
 		if (result.status === 'ok') {
 			switch (command) {
@@ -334,6 +309,36 @@ function elapsed (delta) {
 
 function time (value, units) {
 	return (value << 0 || 1) + units;
+}
+
+function execute (port, command, parameters, callback) {
+	var socket   = net.connect(argv.port),
+		response = '',
+		data     = [command, parameters || '[]', ''].join('\r\n');
+
+	/* Send command and arguments */
+	socket.once('connect', socket.write.bind(socket, data));
+
+	/* Handle errors */
+	socket.once('error', function (error) {
+		callback(error);
+	});
+
+	/* Receive response */
+	socket.on('data', function (data) {
+		if (data instanceof Buffer) {
+			data = data.toString();
+		}
+
+		response += data;
+	});
+
+	/* Handle response */
+	socket.once('end', function () {
+		var result = JSON.parse(response);
+
+		callback(null, JSON.parse(response));
+	});
 }
 
 /* vim: set ft=javascript : */
