@@ -3,12 +3,14 @@
 
 require('coffee-script/register');
 
-var net     = require('net'),
-	fs      = require('fs'),
-	udp     = require('dgram').createSocket('udp4'),
-	dirname = require('path').dirname,
-	params  = JSON.parse(process.argv[2]),
-	Weaver  = require('../lib/weaver');
+var net      = require('net'),
+	fs       = require('fs'),
+	udp      = require('dgram').createSocket('udp4'),
+	assert   = require('assert'),
+	dirname  = require('path').dirname,
+	params   = JSON.parse(process.argv[2]),
+	Weaver   = require('../lib/weaver'),
+	messages = [];
 
 /* Setup control interface */
 var server = net.createServer()
@@ -42,6 +44,11 @@ Weaver.once('exit', function (code) {
 	Weaver.log('Terminated with code ' + code, function () {
 		udp.close(function () {
 			if (code) {
+				if (!params.debug) {
+					/* Write recent log messages to STDERR */
+					fs.writeSync(2, messages.join(''));
+				}
+
 				/* XXX: Not waiting for TCP on unclean exit */
 				process.exit(code);
 			}
@@ -161,17 +168,16 @@ function execute (data) {
 }
 
 function log (message, callback) {
-	if (this === Weaver) {
-		message = process.pid + ' (weaver) ' + message;
-	} else {
-		message = message.slice(0);
-	}
-
-	var data = new Buffer(message + '\n');
+	message = message.replace(/\s*$/, '\n');
 
 	if (params.debug) {
-		fs.writeSync(1, String(data));
+		fs.writeSync(1, message);
 	}
+
+	messages.push(message);
+	messages.splice(0, messages.length - 10);
+
+	var data = new Buffer(message);
 
 	udp.send(data, 0, data.length, params.port, 'localhost', function (error) {
 		/* Log errors to STDERR */
