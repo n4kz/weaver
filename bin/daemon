@@ -84,15 +84,17 @@ function execute (data) {
 			pid     : process.pid,
 			memory  : process.memoryUsage().rss >> 10
 		},
-		argv, command, params, data;
+		argv, command, parameters, data;
 
 	try {
 		argv = data.toString()
 			.replace(/[\r\n]+$/, '')
 			.split('\r\n', 2);
 
-		command = argv.shift();
-		params  = JSON.parse(argv.shift() || '[]');
+		command    = argv.shift();
+		parameters = JSON.parse(argv.shift());
+
+		assert.ok(Array.isArray(parameters), 'Array expected');
 	} catch (error) {
 		result.status  = 'error';
 		result.message = error.message;
@@ -106,12 +108,12 @@ function execute (data) {
 		case 'restart':
 			/* Push signal name to args */
 			if (command === 'kill') {
-				args.push(params.shift());
+				args.push(parameters.shift());
 			}
 
-			if (params.length) {
+			if (parameters.length) {
 				/* by name/pid */
-				params.forEach(function (name) {
+				parameters.forEach(function (name) {
 					Weaver.command(command, String(name), args);
 				});
 			} else {
@@ -123,7 +125,7 @@ function execute (data) {
 
 		case 'drop':
 			/* Remove tasks from configuration */
-			params.forEach(function (name) {
+			parameters.forEach(function (name) {
 				delete Weaver.config[name];
 			});
 
@@ -135,7 +137,7 @@ function execute (data) {
 			break;
 
 		case 'upgrade':
-			readFile(params.shift());
+			readFile(parameters.shift());
 			break;
 
 		case 'dump':

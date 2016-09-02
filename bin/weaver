@@ -177,7 +177,7 @@ if (!command) {
 	/* Prepare arguments */
 	switch (command) {
 		case 'upgrade':
-			parameters = JSON.stringify([resolve(argv.config)]);
+			parameters = [resolve(argv.config)];
 			break;
 
 		case 'kill':
@@ -185,13 +185,13 @@ if (!command) {
 				.replace(/^(?!sig)/i, 'sig')
 				.toUpperCase();
 
-			parameters = JSON.stringify([signal].concat(argv._));
+			parameters = [signal].concat(argv._);
 			break;
 
 		case 'drop':
 		case 'stop':
 		case 'restart':
-			parameters = JSON.stringify(argv._);
+			parameters = argv._;
 			break;
 	}
 
@@ -314,7 +314,7 @@ function time (value, units) {
 function execute (port, command, parameters, callback) {
 	var socket   = net.connect(argv.port),
 		response = '',
-		data     = [command, parameters || '[]', ''].join('\r\n');
+		data     = [command, JSON.stringify(parameters || [])].join('\r\n');
 
 	/* Send command and arguments */
 	socket.once('connect', socket.write.bind(socket, data));
