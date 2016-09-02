@@ -333,7 +333,7 @@ class Task extends EventEmitter
 		unless @executable
 			expanded.NODE_PATH = process.env.NODE_PATH
 
-		for own key of @env
+		for own key, value of @env
 			switch value
 				when true
 					if process.env.hasOwnProperty(key)
