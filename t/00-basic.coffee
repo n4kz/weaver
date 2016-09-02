@@ -33,6 +33,9 @@ events = ['error', 'upgrade']
 
 			assert.isUndefined Weaver.config.__proto__
 
+		logger: ->
+			assert.isFunction Weaver.constructor.logger
+
 		methods: ->
 			for method in methods
 				assert.isFunction Weaver[method]
@@ -42,13 +45,10 @@ events = ['error', 'upgrade']
 				assert.equal EventEmitter.listenerCount(Weaver, event), 1
 
 		watcher: ->
-			assert.isFunction Watcher
+			assert.instanceOf Watcher, Watcher.constructor
 
-			watcher = new Watcher()
-
-			assert.isFunction watcher.stop
-			assert.isFunction watcher.start
-			assert.instanceOf watcher, Watcher
+			assert.isFunction Watcher.stop
+			assert.isFunction Watcher.start
 
 		task: ->
 			assert.isFunction Task

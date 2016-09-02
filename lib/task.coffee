@@ -34,8 +34,7 @@ class Task extends EventEmitter
 
 	@destroy: (name) ->
 		if name of @tasks
-			@tasks[name].watcher
-				.stop(@tasks[name].watchHandler)
+			Watcher.stop(@tasks[name].watchHandler)
 
 			delete @tasks[name]
 
@@ -58,8 +57,8 @@ class Task extends EventEmitter
 
 		return status
 
+	log: ->
 	active: yes
-	watcher: new Watcher()
 
 	constructor: (@name) ->
 		@subtasks     = []
@@ -116,8 +115,8 @@ class Task extends EventEmitter
 
 		switch key
 			when 'watch'
-				@watcher.stop(@watchHandler)
-				@watcher.start(@cwd, @watch or [], @watchHandler)
+				Watcher.stop(@watchHandler)
+				Watcher.start(@cwd, @watch or [], @watchHandler)
 
 		return
 
@@ -152,8 +151,8 @@ class Task extends EventEmitter
 
 		if subtask.pid
 			# Setup logger
-			subtask.process.stdout.on('data', @log.bind(@, "#{subtask.pid} (#{@name})"))
-			subtask.process.stderr.on('data', @log.bind(@, "#{subtask.pid} [#{@name}]"))
+			subtask.process.stdout.on('data', @logHandler.bind(@, subtask.pid))
+			subtask.process.stderr.on('data', @logHandler.bind(@, subtask.pid))
 
 			# Setup exit handler
 			subtask.process.once('exit', @emit.bind(@, 'exit', subtask))
@@ -317,6 +316,11 @@ class Task extends EventEmitter
 
 		if restartRequired
 			@spawn(subtask.id)
+
+		return
+
+	logHandler: (pid, data) ->
+		@log("#{pid} (#{@name}) #{data}")
 
 		return
 

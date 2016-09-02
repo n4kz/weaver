@@ -5,39 +5,11 @@ util = require('util')
 watches = Object.create(null)
 watcher = Object.create(null)
 
-watchHandler = (file, event) ->
-	# TODO: Log changed file
-
-	for callback in watches[file] or []
-		callback(null)
-
-	return
-
-watch = (cwd, callback, error, files) ->
-	if error
-		callback(error)
-		return
-
-	for file in files
-		if file[0] isnt '/'
-			# Expand to full path
-			file = cwd + '/' + file
-
-		callbacks = watches[file]
-
-		if callbacks
-			# Add callback to watches
-			callbacks.push(callback)
-		else
-			# Start watching file
-			watches[file] = [callback]
-			watcher[file] = fs.watch(file, persistent: no, watchHandler.bind(undefined, file))
-
-	return
-
 class Watcher
+	log: ->
+
 	start: (cwd, patterns, callback) ->
-		fn      = watch.bind(undefined, cwd, callback)
+		fn      = @watch.bind(@, cwd, callback)
 		options =
 			cwd     : cwd
 			nomount : yes
@@ -61,4 +33,35 @@ class Watcher
 
 		return
 
-module.exports = Watcher
+	watch: (cwd, callback, error, files) ->
+		if error
+			callback(error)
+			return
+
+		for file in files
+			if file[0] isnt '/'
+				# Expand to full path
+				file = cwd + '/' + file
+
+			callbacks = watches[file]
+
+			if callbacks
+				# Add callback to watches
+				callbacks.push(callback)
+			else
+				# Start watching file
+				watches[file] = [callback]
+				watcher[file] = fs.watch(file, persistent: no, @watchHandler.bind(@, file))
+
+		return
+
+	watchHandler: (file, event) ->
+		if file of watches
+			@log("File #{file} changed")
+
+			for callback in watches[file]
+				callback(null)
+
+		return
+
+module.exports = new Watcher()

@@ -4,9 +4,16 @@ zs           = require('z-schema')
 schema       = require('./schema')
 EventEmitter = require('events').EventEmitter
 Task         = require('./task')
+Watcher      = require('./watcher')
 validator    = new zs(strictMode: true)
 
 class Weaver extends EventEmitter
+	@logger: (fn) ->
+		for item in [Weaver, Task, Watcher.constructor]
+			item::log = fn
+
+		return
+
 	version : require('../package').version
 	log     : ->
 
@@ -142,9 +149,6 @@ class Weaver extends EventEmitter
 		# Create or update tasks
 		for own name, options of @config
 			task = Task.create(name)
-
-			# Setup logger
-			task.log ?= @log.bind(@)
 
 			# Setup error handler
 			unless task.listenerCount('error')
