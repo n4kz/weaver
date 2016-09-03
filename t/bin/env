@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+process.env.$PID = process.pid;
+
+console.log(JSON.stringify(process.env));
+
+/* vim: set ft=javascript : */
