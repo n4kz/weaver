@@ -6,10 +6,14 @@ unlink  = require('fs').unlinkSync
 daemon  = '../bin/weaver'
 port    = 58015
 config  = "#{__dirname}/weaver_#{port}.json"
+random1 = String(Math.random())
+random2 = String(Math.random())
 options =
 	cwd: __dirname
 	env:
 		PATH: process.env.PATH
+		RND1: random1
+		RND2: random2
 		WEAVER_TEST: 1
 		WEAVER_PORT: port
 
@@ -19,7 +23,7 @@ monitor = spawn daemon, ['monitor'], options
 monitor.stdout.on 'data', (data) -> log += String(data)
 
 (require 'vows')
-	.describe('path')
+	.describe('env')
 	.addBatch
 		start:
 			topic: ->
@@ -31,7 +35,8 @@ monitor.stdout.on 'data', (data) -> log += String(data)
 							executable: yes
 							source: 'bin/env'
 							env:
-								PATH : yes
+								RND2 : yes
+								RND3 : yes
 								HOME : no
 								PORT : String(port)
 
@@ -72,7 +77,10 @@ monitor.stdout.on 'data', (data) -> log += String(data)
 					assert.equal env.PORT, port
 					assert.equal env.PATH, process.env.PATH
 					assert.equal env.$PID, pid
+					assert.equal env.RND2, random2
 					assert not env.hasOwnProperty 'HOME'
+					assert not env.hasOwnProperty 'RND1'
+					assert not env.hasOwnProperty 'RND3'
 
 				exit:
 					topic: ->
