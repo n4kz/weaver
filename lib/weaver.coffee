@@ -151,7 +151,7 @@ class Weaver extends EventEmitter
 			task = Task.create(name)
 
 			# Setup error handler
-			unless task.listenerCount('error')
+			unless task.listeners('error').length
 				task.on('error', @emit.bind(@, 'error'))
 
 			task.upgrade(options)
