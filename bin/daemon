@@ -59,11 +59,6 @@ Weaver.once('exit', function (code) {
 Weaver.constructor.logger(log);
 Weaver.log('Started');
 
-/* Read config file */
-if (params.config) {
-	readFile(params.config);
-}
-
 function readFile (filename) {
 	fs.readFile(String(filename), function (error, data) {
 		if (error) {

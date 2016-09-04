@@ -73,7 +73,6 @@ monitor.stdout.on 'data', (data) -> log += String(data)
 					else
 						assert 0, 'UDP log failed'
 
-					assert.equal 0, stdout[1]
 					assert.equal env.PORT, port
 					assert.equal env.PATH, process.env.PATH
 					assert.equal env.$PID, pid

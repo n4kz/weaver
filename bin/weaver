@@ -125,7 +125,6 @@ if (!command) {
 	var daemon = require((process.env.WEAVER_TEST? '..' : 'weaver') + '/lib/daemon'),
 		child  = require('child_process').spawn(daemon, [
 				JSON.stringify({
-					config : exists(argv.config)? resolve(argv.config) : null,
 					port   : argv.port,
 					debug  : argv.debug
 				})
@@ -141,26 +140,42 @@ if (!command) {
 		child.on('exit', function (code, signal) {
 			process.exit(code || 1);
 		});
+	}
 
-		function testConnection () {
-			execute(argv.port, 'status', null, function (error, result) {
-				if (error) {
-					setTimeout(testConnection, 50);
-					return;
+	function testConnection () {
+		execute(argv.port, 'status', null, function (error, result) {
+			if (error) {
+				setTimeout(testConnection, 50);
+				return;
+			}
+
+			if (result.pid === child.pid) {
+				if (exists(argv.config)) {
+					execute(argv.port, 'upgrade', [resolve(argv.config)], function (error, result) {
+						if (error) {
+							console.warn('Could not connect to weaver on port ' + argv.port);
+							process.exit(1);
+						}
+
+						if (!result.status === 'ok') {
+							console.warn(result.message);
+							process.exit(1);
+						}
+					});
 				}
 
-				if (result.pid === child.pid) {
-					/* Daemon started */
+				/* Daemon started */
+				if (!argv.debug) {
 					child.stderr.unref();
 					child.unref();
-				} else {
-					/* XXX: Connected to wrong process */
 				}
-			});
-		}
-
-		setTimeout(testConnection, 100);
+			} else {
+				/* XXX: Connected to wrong process */
+			}
+		});
 	}
+
+	setTimeout(testConnection, 100);
 } else if (command === 'monitor') {
 	var udp    = require('dgram').createSocket('udp4'),
 		stdout = process.stdout;
