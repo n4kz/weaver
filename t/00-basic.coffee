@@ -31,7 +31,7 @@ events = ['error', 'upgrade']
 			assert.deepEqual Weaver.config, {}
 			assert.typeOf    Weaver.config, 'object'
 
-			assert.isUndefined Weaver.config.__proto__
+			assert not Weaver.config.__proto__?
 
 		logger: ->
 			assert.isFunction Weaver.constructor.logger
@@ -58,6 +58,6 @@ events = ['error', 'upgrade']
 			assert.deepEqual Task.tasks, {}
 			assert.typeOf    Task.tasks, 'object'
 
-			assert.isUndefined Task.tasks.__proto__
+			assert not Task.tasks.__proto__?
 
 	.export(module)
