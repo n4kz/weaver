@@ -158,13 +158,16 @@ class Task extends EventEmitter
 			subtask.process.once('exit', @emit.bind(@, 'exit', subtask))
 
 			@log("Task #{subtask.pid} (#{@name}) spawned")
-		else
+
+		subtask.process.once('error', (error) =>
 			subtask.status = 'E'
 			subtask.code   = 255
+			subtask.pid    = 0
 
-			subtask.process.once('error', (error) => @emit('error', error))
+			@emit('error', error)
 
 			@log("Failed to start task (#{@name})")
+		)
 
 		@subtasks[id] = subtask
 
