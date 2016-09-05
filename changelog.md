@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0
+
+Released 2016-09-05
+
+* Starting script now monitors for available TCP connection
+* Configuration is passed only over established TCP connection
+* Daemon finishes when tasks exit, not after longest timeout
+* Refactored core classes (CoffeeScript now)
+* Improved uncaughtException and error handling
+
 ## 0.2.3
 
 Released 2016-08-15
