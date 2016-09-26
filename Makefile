@@ -1,9 +1,11 @@
+export PATH := node_modules/.bin:$(PATH)
+
 test: compile
-	node_modules/.bin/vows --spec -i t/*.js
+	vows --spec -i t/*.js
 	@echo
 
 compile:
-	node_modules/.bin/coffee --compile t/*.coffee
+	coffee --bare --compile {lib,t}/*.coffee
 
 clean:
 	rm -f t/*.js

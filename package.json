@@ -16,7 +16,6 @@
 	},
 
 	"dependencies": {
-		"coffee-script" : ">=1.7.1",
 		"glob"          : "*",
 		"optimist"      : "*",
 		"sprintf"       : "*",
@@ -24,7 +23,8 @@
 	},
 
 	"devDependencies": {
-		"vows": "*"
+		"coffee-script" : ">=1.7.1",
+		"vows"          : "*"
 	},
 
 	"bin": {
