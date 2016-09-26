@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+Released 2016-09-26
+
+* Precompiled CoffeeScript sources
+
 ## 0.3.0
 
 Released 2016-09-05
