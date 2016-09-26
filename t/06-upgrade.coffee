@@ -40,14 +40,15 @@ bpid2 = 0
 								arguments: [1006]
 
 					# Run upgrade command
-					exec "#{daemon} --config #{config} upgrade", options, @callback
+					exec "#{daemon} --config #{config} upgrade", options, (args...) =>
+						setTimeout((=> @callback(args...)), 100)
+
 					return
 
 				status:
 					topic: ->
 						# Check status
-						exec "#{daemon} status", options, (args...) =>
-							setTimeout((=> @callback(args...)), 250)
+						exec "#{daemon} status", options, @callback
 
 						return
 
